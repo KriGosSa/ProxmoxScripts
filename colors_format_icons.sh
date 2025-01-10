@@ -1,3 +1,4 @@
+#!/bin/bash
 # This function sets various color variables using ANSI escape codes for formatting text in the terminal.
   # Colors
   YW=$(echo "\033[33m")

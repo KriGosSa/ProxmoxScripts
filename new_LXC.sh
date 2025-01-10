@@ -7,15 +7,19 @@ set -o nounset
 #$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script, 
 #which is then used as argument for source command
 #source loads content of specified file into current shell
-SCRIPT_DIR = $(dirname "$0")
+SCRIPT_DIR=$(dirname "$0")
+# shellcheck disable=SC1091
 source $SCRIPT_DIR/host_functions.sh
+# shellcheck disable=SC1091
 source $SCRIPT_DIR/colors_format_icons.sh
+# shellcheck disable=SC1091
 source $SCRIPT_DIR/error_handler.sh
+# shellcheck disable=SC1091
 source $SCRIPT_DIR/message_spinner.sh 
 
-WHIPTAIL_BACKTITLE = "Confugure new LXC Container"
-WHIPTAIL_HEIGHT = 9
-WHIPTAIL_WIDTH = 58
+WHIPTAIL_BACKTITLE="Configure new LXC Container"
+WHIPTAIL_HEIGHT=9
+WHIPTAIL_WIDTH=58
 
 
 # Check if the shell is using bash
@@ -54,7 +58,13 @@ if CONTAINER_ID=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --inputbox "Set Conta
       msg_error "Container ID is mandatory"
       exit 
     else
-      echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CONTAINER_ID${CL}"
+      # Test if ID is valid
+      if [ "$CONTAINER_ID" -lt "100" ]; then
+        msg_error "ID cannot be less than 100."
+        exit
+      else
+        echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CONTAINER_ID${CL}"
+      fi
     fi
   else
     exit
@@ -86,9 +96,24 @@ while true; do
     fi
   done
 
-if LOGIN_UNAME=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --inputbox "Set login user name" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+#Create user on Proxmox Host. Naming convention: All small letters! Capitals not allowed lxc_<<container>>
+#_<<compose-project>>_<<container>> for users in docker container
+#  Example: lxc_docker_unifi_network_app
+
+if ROOTMAP_UNAME=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+    if [ -z "$ROOTMAP_UNAME" ]; then
+      msg_error "Rootmap User is mandatory"
+      exit 
+    else
+      echo -e "${CONTAINERID}${BOLD}${DGN}Root will be mapoed to host user name: ${BGN}$ROOTMAP_UNAME${CL}"
+    fi
+  else
+    exit
+  fi 
+
+if LOGIN_UNAME=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$LOGIN_UNAME" ]; then
-      msg_error Login User is mandatory"
+      msg_error "Login User is mandatory"
       exit 
     else
       echo -e "${CONTAINERID}${BOLD}${DGN}Login User Name: ${BGN}$LOGIN_UNAME${CL}"
@@ -106,7 +131,7 @@ while true; do
         elif [ ${#ROOT_PW1} -lt 5 ]; then
           whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
         else
-          if ROOT_PW2=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+          if ROOT_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
             if [[ "$ROOT_PW1" == "$ROOT_PW2" ]]; then
               ROOT_PW="-password $ROOT_PW1"
               echo -e "${VERIFYPW}${BOLD}${DGN}Root Password: ${BGN}********${CL}"
@@ -130,50 +155,27 @@ while true; do
 
 
 
-
-
-
-  
- 
-  PW1 = "TODO"
-  PW = "-password $PW1"
-
-
   
 
   
   #TEMP_DIR=$(mktemp -d)
   #pushd $TEMP_DIR >/dev/null
 
-  
-  export PASSWORD="$PW"
-  export VERBOSE="$VERB"
-  export CTID="$CT_ID"
 
 
 
-
-# Test if required variables are set
-[[ "${CTID:-}" ]] || exit "You need to set 'CTID' variable."
-
-# Test if ID is valid
-[ "$CTID" -ge "100" ] || exit "ID cannot be less than 100."
 
 # Test if ID is in use
-if status $CTID &>/dev/null; then
-  echo -e "ID '$CTID' does not exist."
-  unset CTID
-  exit "Cannot use ID that is not created"
+if status "$CONTAINER_ID" &>/dev/null; then
+  echo -e "ID '$CONTAINER_ID' does not exist."
+  unset CONTAINER_ID
+  msg_error "Cannot use ID that is not created"
+  exit
+fi
 
+  LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
 
-
-
-  LXC_CONFIG=/etc/pve/lxc/${CTID}.conf
-
-#Create user on Proxmox Host. Naming convention: All small letters! Capitals not allowed lxc_<<container>>_<<compose-project>>_<<container>>>
-  Example: lxc_docker_unifi_network_app
-
-sudo adduser <<user>> --shell /bin/false --disabled-login
+sudo adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
   Full-Name Example: Network Application in Project Unifi in Docker LXC
 
 
@@ -201,7 +203,7 @@ sudo useradd unifi_mongo -u 1002 -U --shell /bin/false
 
 #cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched 
 #https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
-cat << EOF >> $LXC_CONFIG
+cat << EOF >> "$LXC_CONFIG"
 lxc.idmap: u 0 $containerUserNo 1
 lxc.idmap: g 0 $containerGroupNo 1
 EOF
