@@ -1,3 +1,4 @@
+#!/bin/bash
 # This function displays a spinner.
 function spinner() {
   local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
@@ -24,7 +25,7 @@ function msg_info() {
 
 # This function displays a success message with a green color.
 function msg_ok() {
-  if [ -n "$SPINNER_PID" ] && ps -p $SPINNER_PID > /dev/null; then kill $SPINNER_PID > /dev/null; fi
+  if [ -n "$SPINNER_PID" ] && ps -p "$SPINNER_PID" > /dev/null; then kill $SPINNER_PID > /dev/null; fi
   printf "\e[?25h"
   local msg="$1"
   echo -e "${BFR}${CM}${GN}${msg}${CL}"
@@ -32,7 +33,7 @@ function msg_ok() {
 
 # This function displays a error message with a red color.
 function msg_error() {
-  if [ -n "$SPINNER_PID" ] && ps -p $SPINNER_PID > /dev/null; then kill $SPINNER_PID > /dev/null; fi
+  if [ -n "$SPINNER_PID" ] && ps -p "$SPINNER_PID" > /dev/null; then kill $SPINNER_PID > /dev/null; fi
   printf "\e[?25h"
   local msg="$1"
   echo -e "${BFR}${CROSS}${RD}${msg}${CL}"

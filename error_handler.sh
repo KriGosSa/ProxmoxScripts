@@ -1,6 +1,7 @@
+#!/bin/bash
 # This function is called when an error occurs. It receives the exit code, line number, and command that caused the error, and displays an error message.
 error_handler() {
-  if [ -n "$SPINNER_PID" ] && ps -p $SPINNER_PID > /dev/null; then kill $SPINNER_PID > /dev/null; fi
+  if [ -n "$SPINNER_PID" ] && ps -p "$SPINNER_PID" > /dev/null; then kill "$SPINNER_PID" > /dev/null; fi
   printf "\e[?25h"
   local exit_code="$?"
   local line_number="$1"
