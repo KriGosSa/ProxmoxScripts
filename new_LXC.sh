@@ -121,7 +121,12 @@ if LOGIN_UNAME=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --inputbox "Set login 
   else
     exit
   fi 
-
+  
+  LOGIN_UID=$(getent passwd "chris" | cut -f 4 -d ":")
+  if [ -z "$LOGIN_UID" ]; then
+    msg_error "Unable to determine ID of login user on the host"
+    exit
+  fi 
 
 while true; do
     if LOGIN_PW1=$(whiptail --backtitle $WHIPTAIL_BACKTITLE --passwordbox "\nSet Root Password (login disabled)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
