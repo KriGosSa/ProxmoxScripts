@@ -5,11 +5,17 @@
 #which is then used as argument for source command 
 SCRIPT_DIR=$(dirname "$0")
 if [[ -f "$SCRIPT_DIR/new_LXC.sh" ]]; then
-    mkdir archive
-    ls | grep -v archive | xargs mv -t archive
+    archivedir=$(mktemp -d archiveXXXXXXXXXXX)
+    ls | grep -v "$archivedir" | xargs mv -t "$archivedir"
 fi
 
 pushd .. >/dev/null
+
+
+if [[ -f "$SCRIPT_DIR/../main.tar.gz" ]]; then
+    rm main.tar.gz
+fi
+
 wget https://github.com/KriGosSa/ProxmoxScripts/archive/refs/heads/main.tar.gz
 tar -xvf main.tar.gz
 pushd ProxmoxScripts-main/ >/dev/null
