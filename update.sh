@@ -6,7 +6,7 @@
 SCRIPT_DIR=$(dirname "$0")
 if [[ -f "$SCRIPT_DIR/new_LXC.sh" ]]; then
     archivedir=$(mktemp -d archive_XXXXXXXXXXX)
-    ls | grep -v | grep '^archive' | xargs mv -t "$archivedir"
+    ls | grep -v '^archive' | xargs mv -t "$archivedir"
 fi
 
 pushd .. >/dev/null
