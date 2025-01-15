@@ -6,13 +6,13 @@
 SCRIPT_DIR=$(dirname "$0")
 if [[ -f "$SCRIPT_DIR/new_LXC.sh" ]]; then
     archivedir=$(mktemp -d archive_XXXXXXXXXXX)
-    ls | grep -v | grep '^\./archive' | xargs mv -t "$archivedir"
+    ls | grep -v | grep '^archive' | xargs mv -t "$archivedir"
 fi
 
 pushd .. >/dev/null
 
 
-if [[ -f "$SCRIPT_DIR/../main.tar.gz" ]]; then
+if [[ -f "./main.tar.gz" ]]; then
     rm main.tar.gz
 fi
 
