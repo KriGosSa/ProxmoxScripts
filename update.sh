@@ -6,7 +6,7 @@
 SCRIPT_DIR=$(dirname "$0")
 if [[ -f "$SCRIPT_DIR/new_LXC.sh" ]]; then
     mkdir archive
-    mv !(archive) archive
+    ls | grep -v archive | xargs mv -t archive
 fi
 
 pushd .. >/dev/null
