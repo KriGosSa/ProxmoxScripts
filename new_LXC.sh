@@ -76,31 +76,7 @@ if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Con
     exit
   fi 
 
-while true; do
-    if ROOT_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Root Password (login disabled)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
-      if [[ ! -z "$ROOT_PW1" ]]; then
-        if [[ "$ROOT_PW1" == *" "* ]]; then
-          whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-        elif [ ${#ROOT_PW1} -lt 5 ]; then
-          whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-        else
-          if ROOT_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
-            if [[ "$ROOT_PW1" == "$ROOT_PW2" ]]; then
-              ROOT_PW="-password $ROOT_PW1"
-              echo -e "${VERIFYPW}${BOLD}${DGN}Root Password: ${BGN}********${CL}"
-              break
-            else
-              whiptail --msgbox "Passwords do not match. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-            fi
-          else
-            exit_script
-          fi
-        fi
-      fi
-    else
-      exit_script
-    fi
-  done
+
 
 #Create user on Proxmox Host. Naming convention: All small letters! Capitals not allowed lxc_<<container>>
 #_<<compose-project>>_<<container>> for users in docker container
