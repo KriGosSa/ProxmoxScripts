@@ -104,26 +104,34 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
     exit
   fi 
   
-  if ! LOGIN_UID=$(getent passwd "chris" | cut -f 4 -d ":");
+  if ! LOGIN_UID=$(getent passwd "chris" | cut -f 3 -d ":");
 #  if [ -z "$LOGIN_UID" ]; then
-    msg_error "Unable to determine ID of login user on the host"
+    msg_error "Unable to determine User ID of login user on the host"
+    exit
+  else
+    echo  "$LOGIN_UID"
+  fi 
+
+  LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":")
+  if [ -z "$LOGIN_GID" ]; then
+    msg_error "Unable to determine Group ID of login user on the host"
     exit
   else
     echo "$LOGIN_UID"
   fi 
 
 while true; do
-    if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Root Password (login disabled)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
-      if [[ ! -z "$ROOT_PW1" ]]; then
-        if [[ "$ROOT_PW1" == *" "* ]]; then
+    if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
+      if [[ ! -z "$LOGIN_PW1" ]]; then
+        if [[ "$LOGIN_PW1" == *" "* ]]; then
           whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-        elif [ ${#ROOT_PW1} -lt 5 ]; then
+        elif [ ${#LOGIN_PW1} -lt 5 ]; then
           whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
         else
-          if ROOT_PW2=$(whiptail --backtitle ""$WHIPTAIL_BACKTITLE"" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
-            if [[ "$ROOT_PW1" == "$ROOT_PW2" ]]; then
-              ROOT_PW="-password $ROOT_PW1"
-              echo -e "${VERIFYPW}${BOLD}${DGN}Root Password: ${BGN}********${CL}"
+          if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+            if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
+              LOGIN_PW="-password $LOGIN_PW1"
+              echo -e "${VERIFYPW}${BOLD}${DGN}Login Password: ${BGN}********${CL}"
               break
             else
               whiptail --msgbox "Passwords do not match. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
@@ -142,18 +150,6 @@ while true; do
 
   SPINNER_PID=""
 
-
-
-  
-
-  
-  #TEMP_DIR=$(mktemp -d)
-  #pushd $TEMP_DIR >/dev/null
-
-
-
-
-
 # Test if ID is in use
 if status "$CONTAINER_ID" &>/dev/null; then
   echo -e "ID '$CONTAINER_ID' does not exist."
@@ -161,6 +157,19 @@ if status "$CONTAINER_ID" &>/dev/null; then
   msg_error "Cannot use ID that is not created"
   exit
 fi
+
+
+if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+    if [ -z "$CONTAINER_MOUNT" ]; then
+      msg_error "Data loss may happen, data should be stored outside container"
+      exit 
+    else
+      echo -e "${CONTAINERID}${BOLD}${DGN}Folder to be mounted into container: ${BGN}$CONTAINER_MOUNT${CL}"
+    fi
+  else
+    exit
+  fi 
+
 
   LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
 
@@ -172,23 +181,25 @@ fi
 echo "doppelter boden"
 exit
 
-sudo adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
-  Full-Name Example: Network Application in Project Unifi in Docker LXC
+adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
 
+  LOGIN_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
+  if [ -z "$ROOTMAP_UID" ]; then
+    msg_error "Unable to determine User ID of rootmap user on the host after creation"
+    exit
+  fi 
 
-Cat /etc/passwd   -> note down user id (first number) and group id (second number)
+  LOGIN_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
+  if [ -z "$ROOTMAP_GID" ]; then
+    msg_error "Unable to determine Group ID of rootmap user on the host after creation"
+    exit
+  fi 
 
-Create mount folder for compose-project in /data/docker
- sudo chown -c lxc_docker:chris -R unifi
+# Create mount folder for compose-project in /data/docker
+  mkdir $CONTAINER_MOUNT
+  chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
 
-Create mount folders for single containers
-sudo chown -c <<container_user>>:chris -R <<folder>>
-
-Lxc_docker_unifi_network_app
-
-sudo chown -c Lxc_docker_unifi_network_app:chris -R network-application 
-
-Allow root (executor of lxc) to map a process to a foreign id
+#Allow root (executor of lxc) to map a process to a foreign id
 echo "root:<<userid>>:1" >> /etc/subuid 
 echo "root:<<groupid>>:1" >> /etc/subgid
 
