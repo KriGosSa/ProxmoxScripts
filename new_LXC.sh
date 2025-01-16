@@ -104,7 +104,7 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
     exit
   fi 
   
-  if LOGIN_UID=$(getent passwd "chris" | cut -f 3 -d ":"); then
+  if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
   if [ -z "$LOGIN_UID" ]; then
     msg_error "Unable to determine User ID of login user on the host"
     exit
@@ -186,13 +186,13 @@ exit
 
 adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
 
-  LOGIN_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
+  ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
   if [ -z "$ROOTMAP_UID" ]; then
     msg_error "Unable to determine User ID of rootmap user on the host after creation"
     exit
   fi 
 
-  LOGIN_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
+  ROOTMAP_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
   if [ -z "$ROOTMAP_GID" ]; then
     msg_error "Unable to determine Group ID of rootmap user on the host after creation"
     exit
