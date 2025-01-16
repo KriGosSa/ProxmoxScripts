@@ -104,10 +104,12 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
     exit
   fi 
   
-  LOGIN_UID=$(getent passwd "chris" | cut -f 4 -d ":")
-  if [ -z "$LOGIN_UID" ]; then
+  if ! LOGIN_UID=$(getent passwd "chris" | cut -f 4 -d ":");
+#  if [ -z "$LOGIN_UID" ]; then
     msg_error "Unable to determine ID of login user on the host"
     exit
+  else
+    echo "$LOGIN_UID"
   fi 
 
 while true; do
