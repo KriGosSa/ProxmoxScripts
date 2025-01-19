@@ -19,6 +19,28 @@ source $SCRIPT_DIR/error_handler.sh
 # shellcheck disable=SC1091
 source $SCRIPT_DIR/message_spinner.sh 
 
+CONTAINER_ID=""
+ROOTMAP_UNAME=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --containerid|-containerid=*)
+      COMTAINER_ID="${1#*=}"
+      ;;
+    --rootmapuname|-rootmapuname=*)
+      ROOTMAP_UNAME="${1#*=}"
+      ;;
+    *)
+      printf "***************************\n"
+      printf "* Error: Invalid argument.*\n"
+      printf "***************************\n"
+      exit 1
+  esac
+  shift
+done
+
+
+
+
 WHIPTAIL_BACKTITLE="Configure new LXC Container"
 WHIPTAIL_HEIGHT=9
 WHIPTAIL_WIDTH=58
@@ -59,6 +81,7 @@ bashtest=${BASH_VERSION:-} #Otherwise if variable is not set, we get an error (d
 #  fi
  
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
+if [ -z "$CONTAINER_ID" ]; then
 if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_ID" ]; then
       msg_error "Container ID is mandatory"
@@ -75,13 +98,14 @@ if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Con
   else
     exit
   fi 
-
+fi
 
 
 #Create user on Proxmox Host. Naming convention: All small letters! Capitals not allowed lxc_<<container>>
 #_<<compose-project>>_<<container>> for users in docker container
 #  Example: lxc_docker_unifi_network_app
 
+if [ -z "$ROOTMAP_UNAME" ]; then
 if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$ROOTMAP_UNAME" ]; then
       msg_error "Rootmap User is mandatory"
@@ -92,6 +116,7 @@ if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create
   else
     exit
   fi 
+fi
 
 if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$LOGIN_UNAME" ]; then
@@ -105,22 +130,27 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
   fi 
   
   if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
-  if [ -z "$LOGIN_UID" ]; then
-    msg_error "Unable to determine User ID of login user on the host"
-    exit
-  else
-    echo  "$LOGIN_UID"
-  fi 
+    if [ -z "$LOGIN_UID" ]; then
+      msg_error "Unable to determine User ID of login user on the host"
+      exit
+    else
+      echo  "$LOGIN_UID"
+    fi 
   else
       msg_error "Failed to determine User ID of login user on the host"
+      exit
   fi
 
-  LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":")
-  if [ -z "$LOGIN_GID" ]; then
-    msg_error "Unable to determine Group ID of login user on the host"
-    exit
+  if LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":"); then
+    if [ -z "$LOGIN_GID" ]; then
+      msg_error "Unable to determine Group ID of login user on the host"
+      exit
+    else
+       echo "$LOGIN_GID"
+    fi 
   else
-    echo "$LOGIN_UID"
+      msg_error "Failed to determine group ID of login user on the host"
+      exit
   fi 
 
 while true; do
@@ -176,6 +206,36 @@ if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set 
 
   LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
 
+
+if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
+  adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
+
+  ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
+  if [ -z "$ROOTMAP_UID" ]; then
+    msg_error "Unable to determine User ID of rootmap user on the host after creation"
+    exit
+  fi 
+else
+  if [ -z "$ROOTMAP_UID" ]; then
+    msg_error "Rootmap user already exists but unable to determine User ID"
+    exit
+  fi 
+fi
+  ROOTMAP_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
+  if [ -z "$ROOTMAP_GID" ]; then
+    msg_error "Unable to determine Group ID of rootmap user on the host after creation"
+    exit
+  fi 
+
+
+
+# Create mount folder for compose-project in /data/docker
+if [ ! -d "$CONTAINER_MOUNT" ]; then
+  mkdir $CONTAINER_MOUNT
+  fi
+  chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
+
+
 if [[ "$1" == "test" ]]; then
   echo "Testmode. Exiting."
   exit
@@ -184,25 +244,8 @@ fi
 echo "doppelter boden"
 exit
 
-adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
-
-  ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
-  if [ -z "$ROOTMAP_UID" ]; then
-    msg_error "Unable to determine User ID of rootmap user on the host after creation"
-    exit
-  fi 
-
-  ROOTMAP_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
-  if [ -z "$ROOTMAP_GID" ]; then
-    msg_error "Unable to determine Group ID of rootmap user on the host after creation"
-    exit
-  fi 
-
-# Create mount folder for compose-project in /data/docker
-  mkdir $CONTAINER_MOUNT
-  chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
-
 #Allow root (executor of lxc) to map a process to a foreign id
+sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
 echo "root:<<userid>>:1" >> /etc/subuid 
 echo "root:<<groupid>>:1" >> /etc/subgid
 
@@ -232,8 +275,4 @@ passwd chris
 
 
   # Set Description in LXC
-  pct set "$CTID" -description "$DESCRIPTION" #Can be HTML
-
-
-
- popd >/dev/null
+  #pct set "$CTID" -description "$DESCRIPTION" #Can be HTML
