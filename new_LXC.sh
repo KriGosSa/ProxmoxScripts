@@ -32,15 +32,18 @@ while [ $# -gt 0 ]; do
     --rootmapuname=*|-rootmapuname=*)
       ROOTMAP_UNAME="${1#*=}"
       ;;
-    --loginuname=*|loginuname=*)
+    --loginuname=*|-loginuname=*)
       LOGIN_UNAME="${1#*=}"
       ;; 
     --mount=*|-mount=*)
       CONTAINER_MOUNT="${1#*=}"
       ;; 
+    --test|-test)
+      TEST=true 
+      ;;
     *)
       printf "***************************\n"
-      printf "* Error: Invalid argument.*\n"
+      printf "* Error: Invalid argument $1.*\n"
       printf "***************************\n"
       #exit 1
   esac
@@ -145,7 +148,7 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
       msg_error "Unable to determine User ID of login user on the host"
       exit
     else
-      echo  "$LOGIN_UID"
+      echo -e "${CONTAINERID}${BOLD}${DGN}Login user ID: ${BGN}$LOGIN_UID${CL}"
     fi 
   else
       msg_error "Failed to determine User ID of login user on the host"
@@ -157,7 +160,7 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
       msg_error "Unable to determine Group ID of login user on the host"
       exit
     else
-       echo "$LOGIN_GID"
+       echo -e "${CONTAINERID}${BOLD}${DGN}Login user group ID: ${BGN}$LOGIN_GID${CL}"
     fi 
   else
       msg_error "Failed to determine group ID of login user on the host"
@@ -202,7 +205,7 @@ if status "$CONTAINER_ID" &>/dev/null; then
   exit
 fi
 
-
+if [ -z "$CONTAINER_MOUNT" ]; then
 if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_MOUNT" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
@@ -213,7 +216,7 @@ if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set 
   else
     exit
   fi 
-
+fi
 
   LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
 
@@ -247,7 +250,7 @@ if [ ! -d "$CONTAINER_MOUNT" ]; then
   chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
 
 
-if [[ "$1" == "test" ]]; then
+if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
 fi
