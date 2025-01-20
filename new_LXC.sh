@@ -6,7 +6,7 @@ SPINNER_PID=""
 
 #$0 returns relative or absolute path to the executed script
 #dirname returns relative path to directory, where the $0 script exists
-#$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script, 
+#$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script,
 #which is then used as argument for source command
 #source loads content of specified file into current shell
 SCRIPT_DIR=$(dirname "$0")
@@ -17,7 +17,7 @@ source $SCRIPT_DIR/colors_format_icons.sh
 # shellcheck disable=SC1091
 source $SCRIPT_DIR/error_handler.sh
 # shellcheck disable=SC1091
-source $SCRIPT_DIR/message_spinner.sh 
+source $SCRIPT_DIR/message_spinner.sh
 
 CONTAINER_ID=""
 ROOTMAP_UNAME=""
@@ -26,61 +26,57 @@ CONTAINER_MOUNT=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --containerid=*|-containerid=*)
-      CONTAINER_ID="${1#*=}"
-      ;;
-    --rootmapuname=*|-rootmapuname=*)
-      ROOTMAP_UNAME="${1#*=}"
-      ;;
-    --loginuname=*|-loginuname=*)
-      LOGIN_UNAME="${1#*=}"
-      ;; 
-    --mount=*|-mount=*)
-      CONTAINER_MOUNT="${1#*=}"
-      ;; 
-    --test|-test)
-      TEST=true 
-      ;;
-    *)
-      printf "***************************\n"
-      printf "* Error: Invalid argument $1.*\n"
-      printf "***************************\n"
-      #exit 1
+  --containerid=* | -containerid=*)
+    CONTAINER_ID="${1#*=}"
+    ;;
+  --rootmapuname=* | -rootmapuname=*)
+    ROOTMAP_UNAME="${1#*=}"
+    ;;
+  --loginuname=* | -loginuname=*)
+    LOGIN_UNAME="${1#*=}"
+    ;;
+  --mount=* | -mount=*)
+    CONTAINER_MOUNT="${1#*=}"
+    ;;
+  --test | -test)
+    TEST=true
+    ;;
+  *)
+    printf "***************************\n"
+    printf "* Error: Invalid argument $1.*\n"
+    printf "***************************\n"
+    #exit 1
+    ;;
   esac
   shift
 done
-
-
-
 
 WHIPTAIL_BACKTITLE="Configure new LXC Container"
 WHIPTAIL_HEIGHT=9
 WHIPTAIL_WIDTH=58
 
-
 # Check if the shell is using bash
- # if [[ "$(basename "$SHELL")" != "bash" ]]; then
- # $SHELL gives the default shell. If (as best practice) login for root is disabled by setting the default shell to /bin/false this is returning wrong results 
+# if [[ "$(basename "$SHELL")" != "bash" ]]; then
+# $SHELL gives the default shell. If (as best practice) login for root is disabled by setting the default shell to /bin/false this is returning wrong results
 bashtest=${BASH_VERSION:-} #Otherwise if variable is not set, we get an error (due to nounset)
- if [[ -z "$bashtest" ]]; then 
-    clear
-    msg_error "Your default shell is currently not set to Bash. To use these scripts, please switch to the Bash shell."
-    echo -e "\nExiting..."
-    sleep 2
-    exit
-  fi
+if [[ -z "$bashtest" ]]; then
+  clear
+  msg_error "Your default shell is currently not set to Bash. To use these scripts, please switch to the Bash shell."
+  echo -e "\nExiting..."
+  sleep 2
+  exit
+fi
 
 # Run as root only
-  if [[ "$(id -u)" -ne 0 ]]; then
-    clear
-    msg_error "Please run this script as root."
-    echo -e "\nExiting..."
-    sleep 2
-    exit
-  fi
-  
+if [[ "$(id -u)" -ne 0 ]]; then
+  clear
+  msg_error "Please run this script as root."
+  echo -e "\nExiting..."
+  sleep 2
+  exit
+fi
 
-#We cannot test for SSh as SUDO will clear the variable SSH_CLIENT 
+#We cannot test for SSh as SUDO will clear the variable SSH_CLIENT
 # This function checks if the script is running through SSH and prompts the user to confirm if they want to proceed or exit.
 #  if [ -n "${SSH_CLIENT:+x}" ]; then
 #    if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH; then
@@ -91,13 +87,13 @@ bashtest=${BASH_VERSION:-} #Otherwise if variable is not set, we get an error (d
 #      exit
 #    fi
 #  fi
- 
+
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
 if [ -z "$CONTAINER_ID" ]; then
-if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_ID" ]; then
       msg_error "Container ID is mandatory"
-      exit 
+      exit
     else
       # Test if ID is valid
       if [ "$CONTAINER_ID" -lt "100" ]; then
@@ -109,93 +105,90 @@ if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Con
     fi
   else
     exit
-  fi 
+  fi
 fi
-
 
 #Create user on Proxmox Host. Naming convention: All small letters! Capitals not allowed lxc_<<container>>
 #_<<compose-project>>_<<container>> for users in docker container
 #  Example: lxc_docker_unifi_network_app
 
 if [ -z "$ROOTMAP_UNAME" ]; then
-if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$ROOTMAP_UNAME" ]; then
       msg_error "Rootmap User is mandatory"
-      exit 
+      exit
     else
       echo -e "${CONTAINERID}${BOLD}${DGN}Root will be mapoed to host user name: ${BGN}$ROOTMAP_UNAME${CL}"
     fi
   else
     exit
-  fi 
+  fi
 fi
 
 if [ -z "$LOGIN_UNAME" ]; then
-if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$LOGIN_UNAME" ]; then
       msg_error "Login User is mandatory"
-      exit 
+      exit
     else
       echo -e "${CONTAINERID}${BOLD}${DGN}Login User Name: ${BGN}$LOGIN_UNAME${CL}"
     fi
   else
     exit
-  fi 
- fi
-  
-  if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
-    if [ -z "$LOGIN_UID" ]; then
-      msg_error "Unable to determine User ID of login user on the host"
-      exit
-    else
-      echo -e "${CONTAINERID}${BOLD}${DGN}Login user ID: ${BGN}$LOGIN_UID${CL}"
-    fi 
-  else
-      msg_error "Failed to determine User ID of login user on the host"
-      exit
   fi
+fi
 
-  if LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":"); then
-    if [ -z "$LOGIN_GID" ]; then
-      msg_error "Unable to determine Group ID of login user on the host"
-      exit
-    else
-       echo -e "${CONTAINERID}${BOLD}${DGN}Login user group ID: ${BGN}$LOGIN_GID${CL}"
-    fi 
+if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
+  if [ -z "$LOGIN_UID" ]; then
+    msg_error "Unable to determine User ID of login user on the host"
+    exit
   else
-      msg_error "Failed to determine group ID of login user on the host"
-      exit
-  fi 
+    echo -e "${CONTAINERID}${BOLD}${DGN}Login user ID: ${BGN}$LOGIN_UID${CL}"
+  fi
+else
+  msg_error "Failed to determine User ID of login user on the host"
+  exit
+fi
+
+if LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":"); then
+  if [ -z "$LOGIN_GID" ]; then
+    msg_error "Unable to determine Group ID of login user on the host"
+    exit
+  else
+    echo -e "${CONTAINERID}${BOLD}${DGN}Login user group ID: ${BGN}$LOGIN_GID${CL}"
+  fi
+else
+  msg_error "Failed to determine group ID of login user on the host"
+  exit
+fi
 
 while true; do
-    if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
-      if [[ ! -z "$LOGIN_PW1" ]]; then
-        if [[ "$LOGIN_PW1" == *" "* ]]; then
-          whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-        elif [ ${#LOGIN_PW1} -lt 5 ]; then
-          whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-        else
-          if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
-            if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
-              LOGIN_PW="-password $LOGIN_PW1"
-              echo -e "${VERIFYPW}${BOLD}${DGN}Login Password: ${BGN}********${CL}"
-              break
-            else
-              whiptail --msgbox "Passwords do not match. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
-            fi
+  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
+    if [[ ! -z "$LOGIN_PW1" ]]; then
+      if [[ "$LOGIN_PW1" == *" "* ]]; then
+        whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+      elif [ ${#LOGIN_PW1} -lt 5 ]; then
+        whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+      else
+        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+          if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
+            LOGIN_PW="-password $LOGIN_PW1"
+            echo -e "${VERIFYPW}${BOLD}${DGN}Login Password: ${BGN}********${CL}"
+            break
           else
-            exit_script
+            whiptail --msgbox "Passwords do not match. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
           fi
+        else
+          exit_script
         fi
       fi
-    else
-      exit_script
     fi
-  done
+  else
+    exit_script
+  fi
+done
 
-
-
-  SPINNER_PID=""
+SPINNER_PID=""
 
 # Test if ID is in use
 if status "$CONTAINER_ID" &>/dev/null; then
@@ -206,20 +199,19 @@ if status "$CONTAINER_ID" &>/dev/null; then
 fi
 
 if [ -z "$CONTAINER_MOUNT" ]; then
-if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_MOUNT" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
-      exit 
+      exit
     else
       echo -e "${CONTAINERID}${BOLD}${DGN}Folder to be mounted into container: ${BGN}$CONTAINER_MOUNT${CL}"
     fi
   else
     exit
-  fi 
+  fi
 fi
 
-  LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
-
+LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
 
 if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
   adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login --comment "root in container $CONTAINER_ID"
@@ -228,50 +220,44 @@ if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
   if [ -z "$ROOTMAP_UID" ]; then
     msg_error "Unable to determine User ID of rootmap user on the host after creation"
     exit
-  fi 
+  fi
 else
   if [ -z "$ROOTMAP_UID" ]; then
     msg_error "Rootmap user already exists but unable to determine User ID"
     exit
-  fi 
+  fi
 fi
-  ROOTMAP_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
-  if [ -z "$ROOTMAP_GID" ]; then
-    msg_error "Unable to determine Group ID of rootmap user on the host after creation"
-    exit
-  fi 
-
-
+ROOTMAP_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
+if [ -z "$ROOTMAP_GID" ]; then
+  msg_error "Unable to determine Group ID of rootmap user on the host after creation"
+  exit
+fi
 
 # Create mount folder for compose-project in /data/docker
 if [ ! -d "$CONTAINER_MOUNT" ]; then
   mkdir $CONTAINER_MOUNT
-  fi
-  chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
-
+fi
+chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
 
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
 fi
 
-echo "doppelter boden"
-exit
 
 #Allow root (executor of lxc) to map a process to a foreign id
 sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
-echo "root:<<userid>>:1" >> /etc/subuid 
-echo "root:<<groupid>>:1" >> /etc/subgid
+echo "root:<<userid>>:1" >>/etc/subuid
+echo "root:<<groupid>>:1" >>/etc/subgid
 
-
-sudo useradd unifi_mongo-express -u 1001 -U  --shell /bin/false --disabled-login
---disabled-login might not work 
--U -> same group ID as UID
+sudo useradd unifi_mongo-express -u 1001 -U --shell /bin/false --disabled-login
+--disabled-login might not work
+-U - group ID as UID >same
 sudo useradd unifi_mongo -u 1002 -U --shell /bin/false
 
-#cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched 
+#cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
 #https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
-cat << EOF >> "$LXC_CONFIG"
+cat <<EOF >>"$LXC_CONFIG"
 lxc.idmap: u 0 $containerUserNo 1
 lxc.idmap: g 0 $containerGroupNo 1
 EOF
@@ -279,14 +265,11 @@ EOF
 useradd -m chris -G sudo
 passwd chris
 
+msg_info "Starting LXC Container"
+pct start "$CTID"
+msg_ok "Started LXC Container"
 
+lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
 
-  msg_info "Starting LXC Container"
-  pct start "$CTID"
-  msg_ok "Started LXC Container"
-
-  lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
-
-
-  # Set Description in LXC
-  #pct set "$CTID" -description "$DESCRIPTION" #Can be HTML
+# Set Description in LXC
+#pct set "$CTID" -description "$DESCRIPTION" #Can be HTML
