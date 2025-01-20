@@ -21,19 +21,28 @@ source $SCRIPT_DIR/message_spinner.sh
 
 CONTAINER_ID=""
 ROOTMAP_UNAME=""
+LOGIN_UNAME=""
+CONTAINER_MOUNT=""
+
 while [ $# -gt 0 ]; do
   case "$1" in
-    --containerid|-containerid=*)
-      COMTAINER_ID="${1#*=}"
+    --containerid=*|-containerid=*)
+      CONTAINER_ID="${1#*=}"
       ;;
-    --rootmapuname|-rootmapuname=*)
+    --rootmapuname=*|-rootmapuname=*)
       ROOTMAP_UNAME="${1#*=}"
       ;;
+    --loginuname=*|loginuname=*)
+      LOGIN_UNAME="${1#*=}"
+      ;; 
+    --mount=*|-mount=*)
+      CONTAINER_MOUNT="${1#*=}"
+      ;; 
     *)
       printf "***************************\n"
       printf "* Error: Invalid argument.*\n"
       printf "***************************\n"
-      exit 1
+      #exit 1
   esac
   shift
 done
@@ -118,6 +127,7 @@ if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create
   fi 
 fi
 
+if [ -z "$LOGIN_UNAME" ]; then
 if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$LOGIN_UNAME" ]; then
       msg_error "Login User is mandatory"
@@ -128,6 +138,7 @@ if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set logi
   else
     exit
   fi 
+ fi
   
   if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
     if [ -z "$LOGIN_UID" ]; then
