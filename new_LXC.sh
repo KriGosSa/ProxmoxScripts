@@ -219,7 +219,7 @@ if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set 
 
 
 if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
-  adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login
+  adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login --comment "root in container $CONTAINER_ID"
 
   ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
   if [ -z "$ROOTMAP_UID" ]; then
