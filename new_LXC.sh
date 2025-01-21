@@ -244,37 +244,40 @@ if [ ! -d "$CONTAINER_MOUNT" ]; then
 fi
 chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
 
+#cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
+#https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
+cat <<EOF >>"$LXC_CONFIG"
+lxc.idmap: u 0 $ROOTMAP_UID 1
+lxc.idmap: g 0 $ROOTMAP_GID 1
+EOF
+
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
 fi
-
-
+#sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
 #Allow root (executor of lxc) to map a process to a foreign id
-sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
 echo "root:<<userid>>:1" >>/etc/subuid
 echo "root:<<groupid>>:1" >>/etc/subgid
-
-sudo useradd unifi_mongo-express -u 1001 -U --shell /bin/false --disabled-login
---disabled-login might not work
--U - group ID as UID >same
-sudo useradd unifi_mongo -u 1002 -U --shell /bin/false
-
-#cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
-#https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
-cat <<EOF >>"$LXC_CONFIG"
-lxc.idmap: u 0 $containerUserNo 1
-lxc.idmap: g 0 $containerGroupNo 1
-EOF
-
-useradd -m chris -G sudo
-passwd chris
 
 msg_info "Starting LXC Container"
 pct start "$CTID"
 msg_ok "Started LXC Container"
 
 lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
+
+exit #below add steps for docker
+#sudo useradd unifi_mongo-express -u 1001 -U --shell /bin/false --disabled-login
+#--disabled-login might not work
+#-U - group ID as UID >same
+#sudo useradd unifi_mongo -u 1002 -U --shell /bin/false
+
+#below goes into container
+
+#useradd -m chris -G sudo
+#passwd chris
+
+
 
 # Set Description in LXC
 #pct set "$CTID" -description "$DESCRIPTION" #Can be HTML
