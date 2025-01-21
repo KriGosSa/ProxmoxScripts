@@ -2,8 +2,6 @@
 #make script fail, when expandimg uninitialized variables
 set -o nounset
 
-SPINNER_PID=""
-
 #$0 returns relative or absolute path to the executed script
 #dirname returns relative path to directory, where the $0 script exists
 #$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script,
@@ -188,7 +186,6 @@ while true; do
   fi
 done
 
-SPINNER_PID=""
 
 # Test if ID is in use
 if status "$CONTAINER_ID" &>/dev/null; then
@@ -212,6 +209,12 @@ if [ -z "$CONTAINER_MOUNT" ]; then
 fi
 
 LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
+if [[ $TEST == true ]]; then
+  LXC_CONFIG_TEST="${LXC_CONFIG}.test"
+  rm "$LXC_CONFIG_TEST"
+  cp "$LXC_CONFIG" "$LXC_CONFIG_TEST"
+  LXC_CONFIG="$LXC_CONFIG_TEST"
+fi
 
 if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
   adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login --comment "root in container $CONTAINER_ID"
