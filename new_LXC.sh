@@ -211,7 +211,9 @@ fi
 LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
 if [[ $TEST == true ]]; then
   LXC_CONFIG_TEST="${LXC_CONFIG}.test"
-  rm "$LXC_CONFIG_TEST"
+  if [ -d "$LXC_CONFIG_TEST" ]; then
+    rm "$LXC_CONFIG_TEST"
+  fi 
   cp "$LXC_CONFIG" "$LXC_CONFIG_TEST"
   LXC_CONFIG="$LXC_CONFIG_TEST"
 fi
