@@ -296,17 +296,24 @@ if ! grep -Fxq "root:$ROOTMAP_GID:1" "$SUBGID"; then
   echo "root:$ROOTMAP_GID:1" >>"$SUBGID"
 fi
 
+
+
+#sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
+
+if pct status 102 | grep -Fq "stopped"; then
+msg_info "Starting LXC Container"
+pct start "$CONTAINER_ID"
+msg_ok "Started LXC Container"
+else
+msg_info "Rebooting LXC Container"
+pct reboot "$CONTAINER_ID"
+msg_ok "Rebooted LXC Container"
+fi
+
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
 fi
-
-#sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
-
-
-msg_info "Starting LXC Container"
-pct start "$CTID"
-msg_ok "Started LXC Container"
 
 lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
 
