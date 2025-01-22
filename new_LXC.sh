@@ -264,7 +264,7 @@ lxc.idmap: g $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_GID
 EOF
 
 
-SUBUID=/etc/subuid
+SUBUID="/etc/subuid"
 if [[ $TEST == true ]]; then
   SUBUID_TEST="./subuid.test"
   if [ -d "$SUBUID_TEST" ]; then
@@ -275,24 +275,24 @@ if [[ $TEST == true ]]; then
 fi
 
 
-SUBGID =/etc/subgid
+SUBGID="/etc/subgid"
 if [[ $TEST == true ]]; then
   SUBGID_TEST="./subgid.test"
   if [ -d "$SUBGID_TEST" ]; then
     rm "$SUBGID_TEST"
   fi 
   cp "$SUBGID" "$SUBGID_TEST"
-  SUBUID="$SUBGID_TEST"
+  SUBGID="$SUBGID_TEST"
 fi
 
 
 
 #Allow root (executor of lxc) to map a process to a foreign id
-if ! grep -Fxq "root:$ROOTMAP_UID:1" "SUBUID"
+if ! grep -Fxq "root:$ROOTMAP_UID:1" "$SUBUID"; then
   echo "root:$ROOTMAP_UID:1" >>"$SUBUID"
 fi
 
-if ! grep -Fxq "root:$ROOTMAP_GID:1" "SUBGID"
+if ! grep -Fxq "root:$ROOTMAP_GID:1" "$SUBGID"; then
   echo "root:$ROOTMAP_GID:1" >>"$SUBGID"
 fi
 
