@@ -259,18 +259,50 @@ lxc.idmap: u 1 100000 $MAP_TO_INVALID_LOWER_UID
 lxc.idmap: g 1 100000 $MAP_TO_INVALID_LOWER_GID
 lxc.idmap: u $LOGIN_UID $LOGIN_UID 1
 lxc.idmap: g $LOGIN_GID $LOGIN_GID 1
-lxc.idmap: u $MAP_TO_INVALID_HIGHER_START_UID 10$LOGIN_UID $MAP_TO_INVALID_HIGHER_CNT_UID
-lxc.idmap: g $MAP_TO_INVALID_HIGHER_START_UID 10$LOGIN_GID $MAP_TO_INVALID_HIGHER_CNT_GID
+lxc.idmap: u $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_UID $MAP_TO_INVALID_HIGHER_CNT_UID
+lxc.idmap: g $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_GID $MAP_TO_INVALID_HIGHER_CNT_GID
 EOF
+
+
+SUBUID=/etc/subuid
+if [[ $TEST == true ]]; then
+  SUBUID_TEST="./subuid.test"
+  if [ -d "$SUBUID_TEST" ]; then
+    rm "$SUBUID_TEST"
+  fi 
+  cp "$SUBUID" "$SUBUID_TEST"
+  SUBUID="$SUBUID_TEST"
+fi
+
+
+SUBGID =/etc/subgid
+if [[ $TEST == true ]]; then
+  SUBGID_TEST="./subgid.test"
+  if [ -d "$SUBGID_TEST" ]; then
+    rm "$SUBGID_TEST"
+  fi 
+  cp "$SUBGID" "$SUBGID_TEST"
+  SUBUID="$SUBGID_TEST"
+fi
+
+
+
+#Allow root (executor of lxc) to map a process to a foreign id
+if ! grep -Fxq "root:$ROOTMAP_UID:1" "SUBUID"
+  echo "root:$ROOTMAP_UID:1" >>"$SUBUID"
+fi
+
+if ! grep -Fxq "root:$ROOTMAP_GID:1" "SUBGID"
+  echo "root:$ROOTMAP_GID:1" >>"$SUBGID"
+fi
 
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
 fi
+
 #sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
-#Allow root (executor of lxc) to map a process to a foreign id
-echo "root:<<userid>>:1" >>/etc/subuid
-echo "root:<<groupid>>:1" >>/etc/subgid
+
 
 msg_info "Starting LXC Container"
 pct start "$CTID"
