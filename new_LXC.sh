@@ -310,6 +310,8 @@ pct reboot "$CONTAINER_ID"
 msg_ok "Rebooted LXC Container"
 fi
 
+lxc-attach -n "$CONTAINER_ID" -- bash -c
+
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
