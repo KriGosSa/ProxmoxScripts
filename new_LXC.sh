@@ -316,7 +316,7 @@ fi
 IN_CONTAINER=$(cat << EOF
 echo "test better cat"
 echo "line 2"
-EOF 
+EOF
 )
 
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
