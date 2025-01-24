@@ -310,7 +310,13 @@ pct reboot "$CONTAINER_ID"
 msg_ok "Rebooted LXC Container"
 fi
 
-lxc-attach -n "$CONTAINER_ID" -- bash -c
+#lxc-attach -n "$CONTAINER_ID" -- bash -c
+#cat "$SCRIPT_DIR/test.sh"  | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
+
+cat <<EOF 
+echo "test better cat"
+echo "line 2"
+EOF | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
