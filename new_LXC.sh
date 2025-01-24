@@ -320,7 +320,7 @@ EOF
 )
 
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
-lxc-attach -n "$CONTAINER_ID" -- bash -c "$(IN_CONTAINER)" param1 "$CONTAINER_ID"
+lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
 
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
