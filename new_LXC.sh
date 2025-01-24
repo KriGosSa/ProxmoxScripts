@@ -161,14 +161,14 @@ else
 fi
 
 while true; do
-  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Root password" 3>&1 1>&2 2>&3); then
+  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login password" 3>&1 1>&2 2>&3); then
     if [[ ! -z "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
         whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
       elif [ ${#LOGIN_PW1} -lt 5 ]; then
         whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
       else
-        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Root Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
             LOGIN_PW="-password $LOGIN_PW1"
             echo -e "${VERIFYPW}${BOLD}${DGN}Login Password: ${BGN}********${CL}"
@@ -313,15 +313,23 @@ fi
 #lxc-attach -n "$CONTAINER_ID" -- bash -c
 #cat "$SCRIPT_DIR/test.sh"  | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 
-cat <<EOF 
+IN_CONTAINER=$(cat << EOF
 echo "test better cat"
 echo "line 2"
-EOF | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
+EOF 
+)
+
+# lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
+lxc-attach -n "$CONTAINER_ID" -- bash -c "$(IN_CONTAINER)" param1 "$CONTAINER_ID"
 
 if [[ $TEST == true ]]; then
   echo "Testmode. Exiting."
   exit
 fi
+
+useradd -m "$LOGIN_UNAME" -u "LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME"
+#passwd chris
+ 
 
 lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
 
@@ -333,8 +341,6 @@ exit #below add steps for docker
 
 #below goes into container
 
-#useradd -m chris -G sudo
-#passwd chris
 
 
 
