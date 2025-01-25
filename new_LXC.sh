@@ -328,7 +328,8 @@ IN_CONTAINER="set -o nounset
   $(envsubst < "$SCRIPT_DIR/colors_format_icons.sh")"
 IN_CONTAINER="$IN_CONTAINER
   $(envsubst < "$SCRIPT_DIR/error_handler.sh")
-  trap 'error_handler $LINENO \"$BASH_COMMAND\"' ERR"
+IN_CONTAINER+=´ 
+  trap \'error_handler $LINENO "$BASH_COMMAND"\' ERR"
 IN_CONTAINER="$IN_CONTAINER
   $(envsubst < $SCRIPT_DIR/message_spinner.sh)"
 IN_CONTAINER="$IN_CONTAINER
