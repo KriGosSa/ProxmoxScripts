@@ -1,7 +1,8 @@
+#!/bin/bash
 msg_info "Installing Dependencies"
- apt-get install -y curl
- apt-get install -y sudo
- apt-get install -y mc
+apt-get install -y curl
+apt-get install -y sudo
+apt-get install -y mc
  apt-get install -y avahi-daemon
  apt-get install -y gnupg2
 msg_ok "Installed Dependencies"
