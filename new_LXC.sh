@@ -219,7 +219,7 @@ if [[ $TEST == true ]]; then
 fi
 
 if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
-  adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login --comment "root in container $CONTAINER_ID"
+  useradd $ROOTMAP_UNAME --shell /bin/false --disabled-login --system --comment "root in container $CONTAINER_ID"
 
   ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
   if [ -z "$ROOTMAP_UID" ]; then
@@ -314,8 +314,10 @@ fi
 #cat "$SCRIPT_DIR/test.sh"  | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 
 IN_CONTAINER=$(cat << EOF
-echo "test better cat"
-echo "line 2"
+useradd -m "$LOGIN_UNAME" -u "LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME"
+echo "$LOGIN_UNAME:$LOGIN_PW" | chpasswd
+# shellcheck disable=SC1091
+source $SCRIPT_DIR/setup_in_new_container.sh
 EOF
 )
 
@@ -327,8 +329,7 @@ if [[ $TEST == true ]]; then
   exit
 fi
 
-useradd -m "$LOGIN_UNAME" -u "LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME"
-#passwd chris
+
  
 
 lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
