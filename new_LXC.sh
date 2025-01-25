@@ -321,7 +321,7 @@ fi
 #EOF
 #)
 
-IN_CONTAINER=(<$SCRIPT_DIR/setup_in_new_container.sh)
+IN_CONTAINER=$(<$SCRIPT_DIR/setup_in_new_container.sh)
 
 echo $IN_CONTAINER
 echo "end debug"
