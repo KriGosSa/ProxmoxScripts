@@ -314,22 +314,17 @@ fi
 #lxc-attach -n "$CONTAINER_ID" -- bash -c
 #cat "$SCRIPT_DIR/test.sh"  | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 
-IN_CONTAINER=$(cat << EOF
-source $SCRIPT_DIR/setup_in_new_container.sh
+#IN_CONTAINER=$(cat << EOF
+#source $SCRIPT_DIR/setup_in_new_container.sh
+#
+#
+#EOF
+#)
 
-if ! LOGIN_GID_EXISTS=$(getent group "$LOGIN_UNAME" ); then
-  groupadd --gid $LOGIN_GID "$LOGIN_UNAME"
-fi 
-  
-if ! ( useradd -m "$LOGIN_UNAME" -u "$LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME" ); then
-msg_error "Failed to create login user in container"
-fi
+IN_CONTAINER=(<$SCRIPT_DIR/setup_in_new_container.sh)
 
-echo "$LOGIN_UNAME:$LOGIN_PW" | chpasswd
-# shellcheck disable=SC1091
-
-EOF
-)
+echo $IN_CONTAINER
+echo "end debug"
 
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"

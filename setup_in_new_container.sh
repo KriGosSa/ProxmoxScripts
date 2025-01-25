@@ -5,6 +5,17 @@
 # License: MIT
 # https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
+if ! LOGIN_GID_EXISTS=$(getent group "$LOGIN_UNAME" ); then
+  groupadd --gid $LOGIN_GID "$LOGIN_UNAME"
+fi 
+  
+if ! ( useradd -m "$LOGIN_UNAME" -u "$LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME" ); then
+msg_error "Failed to create login user in container"
+fi
+
+echo "$LOGIN_UNAME:$LOGIN_PW" | chpasswd
+
+
 # This function sets color variables for formatting output in the terminal
   # Colors
   YW=$(echo "\033[33m")
