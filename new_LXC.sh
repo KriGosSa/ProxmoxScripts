@@ -380,7 +380,7 @@ fi
 #
 #EOF
 #)
-export LOGIN_UNAME=$LOGIN_UNAME
+export CT_LOGIN_UNAME=$LOGIN_UNAME
 
 
 #IN_CONTAINER="set -o nounset
@@ -394,17 +394,20 @@ export LOGIN_UNAME=$LOGIN_UNAME
 #IN_CONTAINER="$IN_CONTAINER
 #  $(envsubst < $SCRIPT_DIR/setup_in_new_container.sh)"
 
-IN_CONTAINER="set -o nounset
-  $("$SCRIPT_DIR/colors_format_icons.sh")"
-IN_CONTAINER="$IN_CONTAINER
-  $("$SCRIPT_DIR/error_handler.sh")"
-IN_CONTAINER+="
-  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
-IN_CONTAINER="$IN_CONTAINER
-  $($SCRIPT_DIR/message_spinner.sh)"
-IN_CONTAINER="$IN_CONTAINER
-  $($SCRIPT_DIR/setup_in_new_container.sh)"
+#IN_CONTAINER="set -o nounset
+#  $("$SCRIPT_DIR/colors_format_icons.sh")"
+#IN_CONTAINER="$IN_CONTAINER
+#  $("$SCRIPT_DIR/error_handler.sh")"
+#IN_CONTAINER+="
+#  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
+#IN_CONTAINER="$IN_CONTAINER
+#  $($SCRIPT_DIR/message_spinner.sh)"
+#IN_CONTAINER="$IN_CONTAINER
+#  $($SCRIPT_DIR/setup_in_new_container.sh)"
 
+IN_CONTAINER="set -o nounset
+echo "'$CT_LOGIN_UNAME'"
+echo "'$ttt'
 
 echo  "$IN_CONTAINER"
 echo "end debug"
