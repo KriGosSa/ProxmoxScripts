@@ -1,12 +1,6 @@
-#!/usr/bin/env bash
-
-# Copyright (c) 2021-2025 tteck
-# Author: tteck (tteckster)
-# License: MIT
-# https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
 if ! LOGIN_GID_EXISTS=$(getent group "$LOGIN_UNAME" ); then
-  groupadd --gid $LOGIN_GID "$LOGIN_UNAME"
+  groupadd --gid "$LOGIN_GID" "$LOGIN_UNAME"
 fi 
   
 if ! ( useradd -m "$LOGIN_UNAME" -u "$LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME" ); then
@@ -16,77 +10,8 @@ fi
 echo "$LOGIN_UNAME:$LOGIN_PW" | chpasswd
 
 
-# This function sets color variables for formatting output in the terminal
-  # Colors
-  YW=$(echo "\033[33m")
-  #YWB=$(echo "\033[93m")
-  BL=$(echo "\033[36m")
-  RD=$(echo "\033[01;31m")
-  GN=$(echo "\033[1;92m")
-
-  # Formatting
-  CL=$(echo "\033[m")
-  BFR="\\r\\033[K"
-  BOLD=$(echo "\033[1m")
-  HOLD=" "
-  TAB="  "
-  
-  # System
-  RETRY_NUM=10
-  RETRY_EVERY=3
-
-  # Icons
-  CM="${TAB}✔️${TAB}${CL}"
-  CROSS="${TAB}✖️${TAB}${CL}"
-  INFO="${TAB}💡${TAB}${CL}"
-  NETWORK="${TAB}📡${TAB}${CL}"
-  OS="${TAB}🖥️${TAB}${CL}"
-  #OSVERSION="${TAB}🌟${TAB}${CL}"
-  HOSTNAME="${TAB}🏠${TAB}${CL}"
-  #GATEWAY="${TAB}🌐${TAB}${CL}"
-  #DEFAULT="${TAB}⚙️${TAB}${CL}"
 
 
-# This function handles errors
-error_handler() {
-  if [ -n "$SPINNER_PID" ] && ps -p $SPINNER_PID > /dev/null; then kill $SPINNER_PID > /dev/null; fi
-  printf "\e[?25h"
-  local exit_code="$?"
-  local line_number="$1"
-  local command="$2"
-  local error_message="${RD}[ERROR]${CL} in line ${RD}$line_number${CL}: exit code ${RD}$exit_code${CL}: while executing command ${YW}$command${CL}"
-  echo -e "\n$error_message"
-  if [[ "$line_number" -eq 23 ]]; then
-    echo -e "The silent function has suppressed the error, run the script with verbose mode enabled, which will provide more detailed output.\n"
-  fi
-}
-
-# This function displays an informational message with a yellow color.
-msg_info() {
-  local msg="$1"
-  echo -ne "${TAB}${YW}${HOLD}${msg}${HOLD}"
-  spinner &
-  SPINNER_PID=$!
-}
-
-# This function displays a success message with a green color.
-msg_ok() {
-  if [ -n "$SPINNER_PID" ] && ps -p $SPINNER_PID > /dev/null; then kill $SPINNER_PID > /dev/null; fi
-  printf "\e[?25h"
-  local msg="$1"
-  echo -e "${BFR}${CM}${GN}${msg}${CL}"
-}
-
-# This function displays a error message with a red color.
-msg_error() {
-  if [ -n "$SPINNER_PID" ] && ps -p $SPINNER_PID > /dev/null; then kill $SPINNER_PID > /dev/null; fi
-  printf "\e[?25h"
-  local msg="$1"
-  echo -e "${BFR}${CROSS}${RD}${msg}${CL}"
-}
-
-  set -Eeuo pipefail
-  trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
 # This function sets up the Container OS by generating the locale, setting the timezone, and checking the network connection
 
   msg_info "Setting up Container OS"
