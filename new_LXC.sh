@@ -14,6 +14,8 @@ SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/colors_format_icons.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/error_handler.sh"
+#needs to be here due envsubst use of errorhandler (would replace variables)
+trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/message_spinner.sh"
 
@@ -325,7 +327,8 @@ export LOGIN_UNAME=$LOGIN_UNAME
 IN_CONTAINER="set -o nounset
   $(envsubst < "$SCRIPT_DIR/colors_format_icons.sh")"
 IN_CONTAINER="$IN_CONTAINER
-  $(envsubst < "$SCRIPT_DIR/error_handler.sh")"
+  $(envsubst < "$SCRIPT_DIR/error_handler.sh")
+  trap 'error_handler $LINENO \"$BASH_COMMAND\"' ERR"
 IN_CONTAINER="$IN_CONTAINER
   $(envsubst < $SCRIPT_DIR/message_spinner.sh)"
 IN_CONTAINER="$IN_CONTAINER
