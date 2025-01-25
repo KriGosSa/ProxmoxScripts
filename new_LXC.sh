@@ -212,8 +212,8 @@ fi
   fi
   
   # Check for at least one special character
-  if ! [[ "$password" =~ [!@#$%^&*()_+\-=\[\]{};:,.<>?] ]]; then
-    msg_error "Password must contain at least one special character (!@#$%^&*()_+-=[]{};:,.<>?)"
+  if ! [[ "$password" =~ [!@#$%&*()_+\-=\[\]{};:,.<>?] ]]; then
+    msg_error "Password must contain at least one special character (!@#$%&*()_+-=[]{};:,.<>?)"
     return 1
   fi
   
