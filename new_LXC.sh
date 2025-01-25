@@ -42,7 +42,6 @@ while [ $# -gt 0 ]; do
   *)
     printf "***************************\n"
     printf "* Error: Invalid argument %s.*\n" "$1"
-
     printf "***************************\n"
     #exit 1
     ;;
@@ -321,7 +320,12 @@ fi
 #EOF
 #)
 export LOGIN_UNAME=$LOGIN_UNAME
-IN_CONTAINER=$(envsubst < $SCRIPT_DIR/setup_in_new_container.sh)
+
+
+IN_CONTAINER=$(envsubst < "$SCRIPT_DIR/colors_format_icons.sh")
+IN_CONTAINER.=$(envsubst < "$SCRIPT_DIR/error_handler.sh")
+IN_CONTAINER.=$(envsubst < "$SCRIPT_DIR/message_spinner.sh")
+IN_CONTAINER.=$(envsubst < "$SCRIPT_DIR/setup_in_new_container.sh")
 
 cat "$IN_CONTAINER"
 echo "end debug"
