@@ -320,10 +320,10 @@ fi
 #
 #EOF
 #)
-
+export LOGIN_UNAME=$LOGIN_UNAME
 IN_CONTAINER=$(envsubst < $SCRIPT_DIR/setup_in_new_container.sh)
 
-echo $IN_CONTAINER
+cat "$IN_CONTAINER"
 echo "end debug"
 
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
