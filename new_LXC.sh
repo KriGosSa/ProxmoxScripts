@@ -327,8 +327,8 @@ IN_CONTAINER.=$(envsubst < "$SCRIPT_DIR/error_handler.sh")
 IN_CONTAINER.=$(envsubst < "$SCRIPT_DIR/message_spinner.sh")
 IN_CONTAINER.=$(envsubst < "$SCRIPT_DIR/setup_in_new_container.sh")
 
-cat "$IN_CONTAINER"
-echo "end debug"
+#cat "$IN_CONTAINER"
+#echo "end debug"
 
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
