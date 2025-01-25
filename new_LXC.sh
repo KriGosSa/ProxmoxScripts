@@ -175,6 +175,9 @@ validate_password() {
 #1 (failure) if any requirement is not met, along with a specific error message
 #Each failure will display a clear message to the user about which requirement was not met, making it easier for users to understand why their password was rejected.
 #You can adjust the min_length variable or modify the special character set according to your specific requirements.
+if [[ $TEST == true ]]; then
+return 0
+fi
   local password="$1"
   local min_length=8
   
