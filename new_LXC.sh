@@ -11,11 +11,11 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 #source $SCRIPT_DIR/host_functions.sh
 # shellcheck disable=SC1091
-source $SCRIPT_DIR/colors_format_icons.sh
+source "$SCRIPT_DIR/colors_format_icons.sh"
 # shellcheck disable=SC1091
-source $SCRIPT_DIR/error_handler.sh
+source "$SCRIPT_DIR/error_handler.sh"
 # shellcheck disable=SC1091
-source $SCRIPT_DIR/message_spinner.sh
+source "$SCRIPT_DIR/message_spinner.sh"
 
 CONTAINER_ID=""
 ROOTMAP_UNAME=""
@@ -41,7 +41,8 @@ while [ $# -gt 0 ]; do
     ;;
   *)
     printf "***************************\n"
-    printf "* Error: Invalid argument $1.*\n"
+    printf "* Error: Invalid argument %s.*\n" "$1"
+
     printf "***************************\n"
     #exit 1
     ;;
@@ -98,7 +99,7 @@ if [ -z "$CONTAINER_ID" ]; then
         msg_error "ID cannot be less than 100."
         exit
       else
-        echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CONTAINER_ID${CL}"
+        echo -e "${CONTAINER_ID}${BOLD}${DGN}Container ID: ${BGN}$CONTAINER_ID${CL}"
       fi
     fi
   else
@@ -116,7 +117,7 @@ if [ -z "$ROOTMAP_UNAME" ]; then
       msg_error "Rootmap User is mandatory"
       exit
     else
-      echo -e "${CONTAINERID}${BOLD}${DGN}Root will be mapoed to host user name: ${BGN}$ROOTMAP_UNAME${CL}"
+      echo -e "${CONTAINER_ID}${BOLD}${DGN}Root will be mapoed to host user name: ${BGN}$ROOTMAP_UNAME${CL}"
     fi
   else
     exit
@@ -129,7 +130,7 @@ if [ -z "$LOGIN_UNAME" ]; then
       msg_error "Login User is mandatory"
       exit
     else
-      echo -e "${CONTAINERID}${BOLD}${DGN}Login User Name: ${BGN}$LOGIN_UNAME${CL}"
+      echo -e "${CONTAINER_ID}${BOLD}${DGN}Login User Name: ${BGN}$LOGIN_UNAME${CL}"
     fi
   else
     exit
@@ -141,7 +142,7 @@ if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
     msg_error "Unable to determine User ID of login user on the host"
     exit
   else
-    echo -e "${CONTAINERID}${BOLD}${DGN}Login user ID: ${BGN}$LOGIN_UID${CL}"
+    echo -e "${CONTAINER_ID}${BOLD}${DGN}Login user ID: ${BGN}$LOGIN_UID${CL}"
   fi
 else
   msg_error "Failed to determine User ID of login user on the host"
@@ -153,7 +154,7 @@ if LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":"); then
     msg_error "Unable to determine Group ID of login user on the host"
     exit
   else
-    echo -e "${CONTAINERID}${BOLD}${DGN}Login user group ID: ${BGN}$LOGIN_GID${CL}"
+    echo -e "${CONTAINER_ID}${BOLD}${DGN}Login user group ID: ${BGN}$LOGIN_GID${CL}"
   fi
 else
   msg_error "Failed to determine group ID of login user on the host"
@@ -162,7 +163,7 @@ fi
 
 while true; do
   if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login password" 3>&1 1>&2 2>&3); then
-    if [[ ! -z "$LOGIN_PW1" ]]; then
+    if [[ -n "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
         whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
       elif [ ${#LOGIN_PW1} -lt 5 ]; then
@@ -201,7 +202,7 @@ if [ -z "$CONTAINER_MOUNT" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit
     else
-      echo -e "${CONTAINERID}${BOLD}${DGN}Folder to be mounted into container: ${BGN}$CONTAINER_MOUNT${CL}"
+      echo -e "${CONTAINER_ID}${BOLD}${DGN}Folder to be mounted into container: ${BGN}$CONTAINER_MOUNT${CL}"
     fi
   else
     exit
@@ -240,9 +241,9 @@ fi
 
 # Create mount folder for compose-project in /data/docker
 if [ ! -d "$CONTAINER_MOUNT" ]; then
-  mkdir $CONTAINER_MOUNT
+  mkdir "$CONTAINER_MOUNT"
 fi
-chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R $CONTAINER_MOUNT
+chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R "$CONTAINER_MOUNT"
 
 #cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
 #https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
@@ -250,8 +251,8 @@ MAP_TO_INVALID_LOWER_UID=$((LOGIN_UID - 1))
 MAP_TO_INVALID_LOWER_GID=$((LOGIN_GID - 1))
 MAP_TO_INVALID_HIGHER_START_UID=$((LOGIN_UID + 1))
 MAP_TO_INVALID_HIGHER_START_GID=$((LOGIN_GID + 1))
-MAP_TO_INVALID_HIGHER_CNT_UID=$((65536 - $LOGIN_UID))
-MAP_TO_INVALID_HIGHER_CNT_GID=$((65536 - $LOGIN_GID))
+MAP_TO_INVALID_HIGHER_CNT_UID=$((65536 - LOGIN_UID))
+MAP_TO_INVALID_HIGHER_CNT_GID=$((65536 - LOGIN_GID))
 cat <<EOF >>"$LXC_CONFIG"
 lxc.idmap: u 0 $ROOTMAP_UID 1
 lxc.idmap: g 0 $ROOTMAP_GID 1
@@ -333,26 +334,3 @@ EOF
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
 
-if [[ $TEST == true ]]; then
-  echo "Testmode. Exiting."
-  exit
-fi
-
-
- 
-
-lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
-
-exit #below add steps for docker
-#sudo useradd unifi_mongo-express -u 1001 -U --shell /bin/false --disabled-login
-#--disabled-login might not work
-#-U - group ID as UID >same
-#sudo useradd unifi_mongo -u 1002 -U --shell /bin/false
-
-#below goes into container
-
-
-
-
-# Set Description in LXC
-#pct set "$CTID" -description "$DESCRIPTION" #Can be HTML
