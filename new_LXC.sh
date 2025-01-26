@@ -371,15 +371,6 @@ pct reboot "$CONTAINER_ID"
 msg_ok "Rebooted LXC Container"
 fi
 
-#lxc-attach -n "$CONTAINER_ID" -- bash -c
-#cat "$SCRIPT_DIR/test.sh"  | lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
-
-#IN_CONTAINER=$(cat << EOF
-#source $SCRIPT_DIR/setup_in_new_container.sh
-#
-#
-#EOF
-#)
 export CT_LOGIN_UNAME=$LOGIN_UNAME
 export CT_LOGIN_UID=$LOGIN_UID
 export CT_LOGIN_GID=$LOGIN_GID
@@ -401,8 +392,8 @@ IN_CONTAINER="set -o nounset
   $(<"$SCRIPT_DIR/colors_format_icons.sh")"
 IN_CONTAINER="$IN_CONTAINER
   $(<"$SCRIPT_DIR/error_handler.sh")"
-IN_CONTAINER+="
-  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
+#IN_CONTAINER+="
+#  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
 IN_CONTAINER="$IN_CONTAINER
   $(<$SCRIPT_DIR/message_spinner.sh)"
 IN_CONTAINER="$IN_CONTAINER
