@@ -1,6 +1,6 @@
 
 if ! LOGIN_GID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
-  groupadd --gid "$CT_LOGIN_GID" "CT_$LOGIN_UNAME"
+  groupadd --gid "$CT_LOGIN_GID" "$CT_LOGIN_UNAME"
 fi 
   
 if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_LOGIN_UID" -g "$CT_LOGIN_GID" -G sudo -c "$CT_LOGIN_UNAME" ); then
