@@ -381,6 +381,9 @@ fi
 #EOF
 #)
 export CT_LOGIN_UNAME=$LOGIN_UNAME
+export CT_LOGIN_UID=$LOGIN_UID
+export CT_LOGIN_GID=$LOGIN_GID
+export CT_LOGIN_PW=$LOGIN_PW
 
 
 #IN_CONTAINER="set -o nounset

@@ -1,13 +1,13 @@
 
-if ! LOGIN_GID_EXISTS=$(getent group "$LOGIN_UNAME" ); then
-  groupadd --gid "$LOGIN_GID" "$LOGIN_UNAME"
+if ! LOGIN_GID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
+  groupadd --gid "$CT_LOGIN_GID" "CT_$LOGIN_UNAME"
 fi 
   
-if ! ( useradd -m "$LOGIN_UNAME" -u "$LOGIN_UID" -g "$LOGIN_GID" -G sudo -c "$LOGIN_UNAME" ); then
+if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_LOGIN_UID" -g "$CT_LOGIN_GID" -G sudo -c "$CT_LOGIN_UNAME" ); then
 msg_error "Failed to create login user in container"
 fi
 
-echo "$LOGIN_UNAME:$LOGIN_PW" | chpasswd
+echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd
 
 
 
