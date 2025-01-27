@@ -3,8 +3,11 @@ if ! LOGIN_GID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
   groupadd --gid "$CT_LOGIN_GID" "$CT_LOGIN_UNAME"
 fi 
   
+if ! LOGIN_USER_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
 if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_LOGIN_UID" -g "$CT_LOGIN_GID" -G sudo -c "$CT_LOGIN_UNAME" ); then
 msg_error "Failed to create login user in container"
+exit_script
+fi
 fi
 
 echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd
@@ -28,19 +31,24 @@ RETRY_EVERY=3
     echo -e "${NETWORK}Check Network Settings"
     exit 1
   fi
-  rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
+#I think usimg a package manager to manage python depende cies is better than manual, so let's try to keep the defaulr settingx
+#https://packaging.python.org/en/latest/specifications/externally-managed-environments/externally-managed-environments
+#  rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
+
+#Do  ot wait for network during boot
   systemctl disable -q --now systemd-networkd-wait-online.service
+  
   msg_ok "Set up Container OS"
   msg_ok "Network Connected: ${BL}$(hostname -I)"
-exit
+
 # This function checks the network connection by pinging a known IP address and prompts the user to continue if the internet is not connected
-  set +e
-  trap - ERR
+  #set +e
+  #trap - ERR
   ipv4_connected=false
   ipv6_connected=false
   sleep 1
 # Check IPv4 connectivity to Google, Cloudflare & Quad9 DNS servers.
-  if ping -c 1 -W 1 1.1.1.1 &>/dev/null || ping -c 1 -W 1 8.8.8.8 &>/dev/null || ping -c 1 -W 1 9.9.9.9 &>/dev/null; then 
+  if ping -c 1 -W 1 1.1.1.300 &>/dev/null || ping -c 1 -W 1 8.8.8.8 &>/dev/null || ping -c 1 -W 1 9.9.9.9 &>/dev/null; then 
     msg_ok "IPv4 Internet Connected";
     ipv4_connected=true
   else
@@ -68,14 +76,14 @@ exit
 
   RESOLVEDIP=$(getent hosts github.com | awk '{ print $1 }')
   if [[ -z "$RESOLVEDIP" ]]; then msg_error "DNS Lookup Failure"; else msg_ok "DNS Resolved github.com to ${BL}$RESOLVEDIP${CL}"; fi
-  set -e
-  trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
+  activate_err_handler
 
 # This function updates the Container OS by running apt-get update and upgrade
   msg_info "Updating Container OS"
    apt-get update
    apt-get -o Dpkg::Options::="--force-confold" -y dist-upgrade
-  rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
+   #see above
+   #rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
   msg_ok "Updated Container OS"
 
 

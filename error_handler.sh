@@ -11,5 +11,7 @@ error_handler() {
 }
 
 # This function enables error handling in the script by setting options and defining a trap for the ERR signal.
+function activate_err_handler() {
   set -Eeuo pipefail
   trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
+} 

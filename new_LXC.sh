@@ -14,8 +14,7 @@ SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/colors_format_icons.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/error_handler.sh"
-#needs to be here due envsubst use of errorhandler (would replace variables)
-trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
+activate_err_handler
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/message_spinner.sh"
 
@@ -399,10 +398,6 @@ IN_CONTAINER="$IN_CONTAINER
 IN_CONTAINER="$IN_CONTAINER
   $(<$SCRIPT_DIR/setup_in_new_container.sh)"
 
-
-
-echo  "$IN_CONTAINER"
-echo "end debug"
 
 # lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
