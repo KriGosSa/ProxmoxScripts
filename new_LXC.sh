@@ -17,6 +17,8 @@ source "$SCRIPT_DIR/error_handler.sh"
 activate_err_handler
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/message_spinner.sh"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/password_validation.sh"
 
 CONTAINER_ID=""
 ROOTMAP_UNAME=""
@@ -178,72 +180,13 @@ else
   exit
 fi
 
-validate_password() {
-#This new validation:
-#Requires minimum length of 8 characters
-#Prohibits spaces
-#Requires at least one uppercase letter
-#Requires at least one lowercase letter
-#Requires at least one number
-#6. Requires at least one special character
-#The function returns:
-#0 (success) if the password meets all requirements
-#1 (failure) if any requirement is not met, along with a specific error message
-#Each failure will display a clear message to the user about which requirement was not met, making it easier for users to understand why their password was rejected.
-#You can adjust the min_length variable or modify the special character set according to your specific requirements.
-if [[ $TEST == true ]]; then
-return 0
-fi
-  local password="$1"
-  local min_length=8
-  
-  # Check minimum length
-  if [ ${#password} -lt $min_length ]; then
-    msg_error "Password must be at least $min_length characters long"
-    return 1
-  fi
-  
-  # Check for spaces
-  if [[ "$password" =~ [[:space:]] ]]; then
-    msg_error "Password cannot contain spaces"
-    return 1
-  fi
-  
-  # Check for at least one uppercase letter
-  if ! [[ "$password" =~ [A-Z] ]]; then
-    msg_error "Password must contain at least one uppercase letter"
-    return 1
-  fi
-  
-  # Check for at least one lowercase letter
-  if ! [[ "$password" =~ [a-z] ]]; then
-    msg_error "Password must contain at least one lowercase letter"
-    return 1
-  fi
-  
-  # Check for at least one number
-  if ! [[ "$password" =~ [0-9] ]]; then
-    msg_error "Password must contain at least one number"
-    return 1
-  fi
-  
-  # Check for at least one special character
-  if ! [[ "$password" =~ [[:punct:]] ]]; then
-    msg_error "Password must contain at least one special character (!@#$%&*()_+-=[]{};:,.<>?)"
-    return 1
-  fi
-  
-  return 0
-}
-
-
 while true; do
   if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login password" 3>&1 1>&2 2>&3); then
     if [[ -n "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
         whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
       elif ! validate_password "$LOGIN_PW1"; then
-        whiptail --msgbox "Password must be at least 5 characters long. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+        whiptail --msgbox "Password must meat the complexity criteria. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
       else
         if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
