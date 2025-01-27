@@ -1,4 +1,4 @@
-
+  msg_info "Setting up Container OS"
 if ! LOGIN_GID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
   groupadd --gid "$CT_LOGIN_GID" "$CT_LOGIN_UNAME"
   msg_ok "Created group $CT_LOGIN_UNAME with GID $CT_LOGIN_GID"
@@ -25,7 +25,7 @@ RETRY_EVERY=3
 
 # This function sets up the Container OS by generating the locale, setting the timezone, and checking the network connection
 
-  msg_info "Setting up Container OS"
+echo ""
   for ((i = RETRY_NUM; i > 0; i--)); do
     if [ "$(hostname -I)" != "" ]; then
       break
@@ -112,7 +112,7 @@ RETRY_EVERY=3
   MOTD_FILE="/etc/motd"
   if [ -f "$MOTD_FILE" ]; then
     # Start MOTD with application info and link
-    echo -e "\n${BOLD}${APPLICATION} LXC Container${CL}" > "$MOTD_FILE"
+    echo -e "\n${BOLD}${CT_APPLICATION_TITLE} LXC Container${CL}" > "$MOTD_FILE"
 
     # Add system information with icons
     echo -e "${TAB}${OS}${YW} OS: ${GN}${OS_NAME} ${CL}" >> "$MOTD_FILE"

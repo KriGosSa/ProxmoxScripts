@@ -38,7 +38,7 @@ while [ $# -gt 0 ]; do
   --mount=* | -mount=*)
     CONTAINER_MOUNT="${1#*=}"
     ;;
-  --apptitle=* | - apptitle=*)
+  --apptitle=* | -apptitle=*)
     APPLICATION_TITLE="${1#*=}"
     ;;
   --test | -test)
