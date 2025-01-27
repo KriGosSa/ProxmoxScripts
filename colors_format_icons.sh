@@ -1,45 +1,45 @@
 #!/bin/bash
 # This function sets various color variables using ANSI escape codes for formatting text in the terminal.
   # Colors
-  YW=$(echo "\033[33m")
-  YWB=$(echo "\033[93m")
-  BL=$(echo "\033[36m")
-  RD=$(echo "\033[01;31m")
-  BGN=$(echo "\033[4;92m")
-  GN=$(echo "\033[1;92m")
-  DGN=$(echo "\033[32m")
+  COLOR_YELLOW=$(echo "\033[33m")
+  COLOR_BRIGHT_YELLOW=$(echo "\033[93m")
+  COLOR_BLUE=$(echo "\033[36m")
+  COLOR_RED=$(echo "\033[01;31m")
+  COLOR_BRIGHT_GREEN=$(echo "\033[4;92m")
+  COLOR_GREEN=$(echo "\033[1;92m")
+  COLOR_DARK_GREEN=$(echo "\033[32m")
 
   # Formatting
-  CL=$(echo "\033[m")
-  UL=$(echo "\033[4m")
-  BOLD=$(echo "\033[1m")
-  BFR="\\r\\033[K"
-  HOLD=" "
-  TAB="  "
+  COLOR_RESET=$(echo "\033[m")
+  FORMAT_UNDERLINE=$(echo "\033[4m")
+  FORMAT_BOLD=$(echo "\033[1m")
+  BUFFER_CLEAR="\\r\\033[K"
+  SPACE_HOLD=" "
+  INDENT="  "
   whiptailHeight=10
   whiptailWidth=72
 
   # Icons
-  CM="${TAB}✔️${TAB}${CL}"
-  CROSS="${TAB}✖️${TAB}${CL}"
-  INFO="${TAB}💡${TAB}${CL}"
-  OS="${TAB}🖥️${TAB}${CL}"
-  OSVERSION="${TAB}🌟${TAB}${CL}"
-  CONTAINERTYPE="${TAB}📦${TAB}${CL}" 
-  DISKSIZE="${TAB}💾${TAB}${CL}"
-  CPUCORE="${TAB}🧠${TAB}${CL}"
-  RAMSIZE="${TAB}🛠️${TAB}${CL}"
-  SEARCH="${TAB}🔍${TAB}${CL}"
-  VERIFYPW="${TAB}🔐${TAB}${CL}"
-  CONTAINERID="${TAB}🆔${TAB}${CL}"
-  HOSTNAME="${TAB}🏠${TAB}${CL}"
-  BRIDGE="${TAB}🌉${TAB}${CL}"
-  NETWORK="${TAB}📡${TAB}${CL}"
-  GATEWAY="${TAB}🌐${TAB}${CL}"
-  DISABLEIPV6="${TAB}🚫${TAB}${CL}"
-  DEFAULT="${TAB}⚙️${TAB}${CL}"
-  MACADDRESS="${TAB}🔗${TAB}${CL}"
-  VLANTAG="${TAB}🏷️${TAB}${CL}"
-  ROOTSSH="${TAB}🔑${TAB}${CL}"
-  CREATING="${TAB}🚀${TAB}${CL}"
-  ADVANCED="${TAB}🧩${TAB}${CL}"
+  ICON_CHECKMARK="${INDENT}✔️${INDENT}${COLOR_RESET}"
+  ICON_CROSS="${INDENT}✖️${INDENT}${COLOR_RESET}"
+  ICON_INFO="${INDENT}💡${INDENT}${COLOR_RESET}"
+  ICON_OS="${INDENT}🖥️${INDENT}${COLOR_RESET}"
+  ICON_OS_VERSION="${INDENT}🌟${INDENT}${COLOR_RESET}"
+  ICON_CONTAINER="${INDENT}📦${INDENT}${COLOR_RESET}"
+  ICON_DISK="${INDENT}💾${INDENT}${COLOR_RESET}"
+  ICON_CPU="${INDENT}🧠${INDENT}${COLOR_RESET}"
+  ICON_RAM="${INDENT}🛠️${INDENT}${COLOR_RESET}"
+  ICON_SEARCH="${INDENT}🔍${INDENT}${COLOR_RESET}"
+  ICON_PASSWORD="${INDENT}🔐${INDENT}${COLOR_RESET}"
+  ICON_CONTAINER_ID="${INDENT}🆔${INDENT}${COLOR_RESET}"
+  ICON_HOSTNAME="${INDENT}🏠${INDENT}${COLOR_RESET}"
+  ICON_BRIDGE="${INDENT}🌉${INDENT}${COLOR_RESET}"
+  ICON_NETWORK="${INDENT}📡${INDENT}${COLOR_RESET}"
+  ICON_GATEWAY="${INDENT}🌐${INDENT}${COLOR_RESET}"
+  ICON_IPV6_DISABLED="${INDENT}🚫${INDENT}${COLOR_RESET}"
+  ICON_DEFAULT="${INDENT}⚙️${INDENT}${COLOR_RESET}"
+  ICON_MAC_ADDRESS="${INDENT}🔗${INDENT}${COLOR_RESET}"
+  ICON_VLAN="${INDENT}🏷️${INDENT}${COLOR_RESET}"
+  ICON_SSH="${INDENT}🔑${INDENT}${COLOR_RESET}"
+  ICON_LAUNCH="${INDENT}🚀${INDENT}${COLOR_RESET}"
+  ICON_ADVANCED="${INDENT}🧩${INDENT}${COLOR_RESET}"

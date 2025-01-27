@@ -30,12 +30,12 @@ echo ""
     if [ "$(hostname -I)" != "" ]; then
       break
     fi
-    echo 1>&2 -en "${CROSS}${RD} No Network! "
+    echo 1>&2 -en "${ICON_CROSS}${COLOR_RED} No Network! "
     sleep $RETRY_EVERY
   done
   if [ "$(hostname -I)" = "" ]; then
-    echo 1>&2 -e "\n${CROSS}${RD} No Network After $RETRY_NUM Tries${CL}"
-    echo -e "${NETWORK}Check Network Settings"
+    echo 1>&2 -e "\n${ICON_CROSS}${COLOR_RED} No Network After $RETRY_NUM Tries${COLOR_RESET}"
+    echo -e "${ICON_NETWORK}Check Network Settings"
     exit 1
   fi
 #I think usimg a package manager to manage python depende cies is better than manual, so let's try to keep the defaulr settingx
@@ -46,7 +46,7 @@ echo ""
   systemctl disable -q --now systemd-networkd-wait-online.service
   
   #msg_ok "Set up Container OS"
-  msg_ok "Network Connected: ${BL}$(hostname -I)"
+  msg_ok "Network Connected: ${COLOR_BLUE}$(hostname -I)"
 
 # This function checks the network connection by pinging a known IP address and prompts the user to continue if the internet is not connected
   #set +e
@@ -74,15 +74,15 @@ echo ""
   if [[ $ipv4_connected == false && $ipv6_connected == false ]]; then
     read -r -p "No Internet detected,would you like to continue anyway? <y/N> " prompt
     if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-      echo -e "${INFO}${RD}Expect Issues Without Internet${CL}"
+      echo -e "${ICON_INFO}${COLOR_RED}Expect Issues Without Internet${COLOR_RESET}"
     else
-      echo -e "${NETWORK}Check Network Settings"
+      echo -e "${ICON_NETWORK}Check Network Settings"
       exit 1
     fi
   fi
 
   RESOLVEDIP=$(getent hosts github.com | awk '{ print $1 }')
-  if [[ -z "$RESOLVEDIP" ]]; then msg_error "DNS Lookup Failure"; else msg_ok "DNS Resolved github.com to ${BL}$RESOLVEDIP${CL}"; fi
+  if [[ -z "$RESOLVEDIP" ]]; then msg_error "DNS Lookup Failure"; else msg_ok "DNS Resolved github.com to ${COLOR_BLUE}$RESOLVEDIP${COLOR_RESET}"; fi
 
 
 # This function updates the Container OS by running apt-get update and upgrade
@@ -112,12 +112,12 @@ echo ""
   MOTD_FILE="/etc/motd"
   if [ -f "$MOTD_FILE" ]; then
     # Start MOTD with application info and link
-    echo -e "\n${BOLD}${CT_APPLICATION_TITLE} LXC Container${CL}" > "$MOTD_FILE"
+    echo -e "\n${FORMAT_BOLD}${CT_APPLICATION_TITLE} LXC Container${COLOR_RESET}" > "$MOTD_FILE"
 
     # Add system information with icons
-    echo -e "${TAB}${OS}${YW} OS: ${GN}${OS_NAME} ${CL}" >> "$MOTD_FILE"
-    echo -e "${TAB}${HOSTNAME}${YW} Hostname: ${GN}$(hostname)${CL}" >> "$MOTD_FILE"
-    echo -e "${TAB}${INFO}${YW} IP Address: ${GN}${IP}${CL}" >> "$MOTD_FILE"
+    echo -e "${INDENT}${ICON_OS}${COLOR_YELLOW} OS: ${COLOR_GREEN}${OS_NAME} ${COLOR_RESET}" >> "$MOTD_FILE"
+    echo -e "${INDENT}${ICON_HOSTNAME}${COLOR_YELLOW} Hostname: ${COLOR_GREEN}$(hostname)${COLOR_RESET}" >> "$MOTD_FILE"
+    echo -e "${INDENT}${ICON_INFO}${COLOR_YELLOW} IP Address: ${COLOR_GREEN}${IP}${COLOR_RESET}" >> "$MOTD_FILE"
   else
     echo "MotD file does not exist!" >&2
   fi

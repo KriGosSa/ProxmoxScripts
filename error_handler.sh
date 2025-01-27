@@ -6,7 +6,7 @@ error_handler() {
   local exit_code="$?"
   local line_number="$1"
   local command="$2"
-  local error_message="${RD}[ERROR]${CL} in line ${RD}$line_number${CL}: exit code ${RD}$exit_code${CL}: while executing command ${YW}$command${CL}"
+  local error_message="${COLOR_RED}[ERROR]${COLOR_RESET} in line ${COLOR_RED}$line_number${COLOR_RESET}: exit code ${COLOR_RED}$exit_code${COLOR_RESET}: while executing command ${COLOR_YELLOW}$command${COLOR_RESET}"
   echo -e "\n$error_message\n"
 }
 

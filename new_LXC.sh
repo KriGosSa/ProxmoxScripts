@@ -104,7 +104,7 @@ if [ -z "$CONTAINER_ID" ]; then
         msg_error "ID cannot be less than 100."
         exit
       else
-        echo -e "${CONTAINER_ID}${BOLD}${DGN}Container ID: ${BGN}$CONTAINER_ID${CL}"
+        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$CONTAINER_ID${COLOR_RESET}"
       fi
     fi
   else
@@ -134,7 +134,7 @@ if [ -z "$ROOTMAP_UNAME" ]; then
       msg_error "Rootmap User is mandatory"
       exit
     else
-      echo -e "${CONTAINER_ID}${BOLD}${DGN}Root will be mapoed to host user name: ${BGN}$ROOTMAP_UNAME${CL}"
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Root will be mapped to host user name: ${COLOR_BRIGHT_GREEN}$ROOTMAP_UNAME${COLOR_RESET}"
     fi
   else
     exit
@@ -147,7 +147,7 @@ if [ -z "$LOGIN_UNAME" ]; then
       msg_error "Login User is mandatory"
       exit
     else
-      echo -e "${CONTAINER_ID}${BOLD}${DGN}Login User Name: ${BGN}$LOGIN_UNAME${CL}"
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login User Name: ${COLOR_BRIGHT_GREEN}$LOGIN_UNAME${COLOR_RESET}"
     fi
   else
     exit
@@ -159,7 +159,7 @@ if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
     msg_error "Unable to determine User ID of login user on the host"
     exit
   else
-    echo -e "${CONTAINER_ID}${BOLD}${DGN}Login user ID: ${BGN}$LOGIN_UID${CL}"
+    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user ID: ${COLOR_BRIGHT_GREEN}$LOGIN_UID${COLOR_RESET}"
   fi
 else
   msg_error "Failed to determine User ID of login user on the host"
@@ -171,7 +171,7 @@ if LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":"); then
     msg_error "Unable to determine Group ID of login user on the host"
     exit
   else
-    echo -e "${CONTAINER_ID}${BOLD}${DGN}Login user group ID: ${BGN}$LOGIN_GID${CL}"
+    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user group ID: ${COLOR_BRIGHT_GREEN}$LOGIN_GID${COLOR_RESET}"
   fi
 else
   msg_error "Failed to determine group ID of login user on the host"
@@ -248,7 +248,7 @@ while true; do
         if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
             LOGIN_PW="-password $LOGIN_PW1"
-            echo -e "${VERIFYPW}${BOLD}${DGN}Login Password: ${BGN}********${CL}"
+            echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
             break
           else
             whiptail --msgbox "Passwords do not match. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
@@ -278,7 +278,7 @@ if [ -z "$CONTAINER_MOUNT" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit
     else
-      echo -e "${CONTAINER_ID}${BOLD}${DGN}Folder to be mounted into container: ${BGN}$CONTAINER_MOUNT${CL}"
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Folder to be mounted into container: ${COLOR_BRIGHT_GREEN}$CONTAINER_MOUNT${COLOR_RESET}"
     fi
   else
     exit
