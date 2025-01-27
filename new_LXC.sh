@@ -22,6 +22,7 @@ CONTAINER_ID=""
 ROOTMAP_UNAME=""
 LOGIN_UNAME=""
 CONTAINER_MOUNT=""
+APPLICATION_TITLE=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -36,6 +37,9 @@ while [ $# -gt 0 ]; do
     ;;
   --mount=* | -mount=*)
     CONTAINER_MOUNT="${1#*=}"
+    ;;
+  --apptitle=* | - apptitle=*)
+    APPLICATION_TITLE="${1#*=}"
     ;;
   --test | -test)
     TEST=true
@@ -101,6 +105,18 @@ if [ -z "$CONTAINER_ID" ]; then
       else
         echo -e "${CONTAINER_ID}${BOLD}${DGN}Container ID: ${BGN}$CONTAINER_ID${CL}"
       fi
+    fi
+  else
+    exit
+  fi
+fi
+
+
+if [ -z "$APPLICATION_TITLE" ]; then
+  if APPLICATION_TITLE=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+    if [ -z "$CONTAINER_ID" ]; then
+      msg_info "No application title provided"
+      exit
     fi
   else
     exit
@@ -374,6 +390,7 @@ export CT_LOGIN_UNAME=$LOGIN_UNAME
 export CT_LOGIN_UID=$LOGIN_UID
 export CT_LOGIN_GID=$LOGIN_GID
 export CT_LOGIN_PW=$LOGIN_PW
+export CT_APPLICATION_TITLE=$APPLICATION_TITLE
 
 
 #IN_CONTAINER="set -o nounset
