@@ -23,6 +23,7 @@ ROOTMAP_UNAME=""
 LOGIN_UNAME=""
 CONTAINER_MOUNT=""
 APPLICATION_TITLE=""
+TEST=false
 
 while [ $# -gt 0 ]; do
   case "$1" in
