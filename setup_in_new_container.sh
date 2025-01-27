@@ -1,13 +1,20 @@
 
 if ! LOGIN_GID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
   groupadd --gid "$CT_LOGIN_GID" "$CT_LOGIN_UNAME"
+  msg_ok "Created group $CT_LOGIN_UNAME with GID $CT_LOGIN_GID"
+else
+  msg_info "Group $CT_LOGIN_UNAME already exists"
 fi 
   
-if ! LOGIN_USER_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
-if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_LOGIN_UID" -g "$CT_LOGIN_GID" -G sudo -c "$CT_LOGIN_UNAME" ); then
-msg_error "Failed to create login user in container"
-exit_script
-fi
+if ! LOGIN_USER_EXISTS=$(getent passwd "$CT_LOGIN_UNAME" ); then
+  if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_LOGIN_UID" -g "$CT_LOGIN_GID" -G sudo -c "$CT_LOGIN_UNAME" ); then
+    msg_error "Failed to create login user in container"
+    exit_script
+  else
+    msg_ok "Added user $CT_LOGIN_UNAME (ID $CT_LOGIN_UID) to container"
+  fi
+else
+  msg_info "Login-User $CT_LOGIN_UNAME already exist"
 fi
 
 echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd
@@ -48,7 +55,7 @@ RETRY_EVERY=3
   ipv6_connected=false
   sleep 1
 # Check IPv4 connectivity to Google, Cloudflare & Quad9 DNS servers.
-  if ping -c 1 -W 1 1.1.1.300 &>/dev/null || ping -c 1 -W 1 8.8.8.8 &>/dev/null || ping -c 1 -W 1 9.9.9.9 &>/dev/null; then 
+  if ping -c 1 -W 1 1.1.1.1 &>/dev/null || ping -c 1 -W 1 8.8.8.8 &>/dev/null || ping -c 1 -W 1 9.9.9.9 &>/dev/null; then 
     msg_ok "IPv4 Internet Connected";
     ipv4_connected=true
   else
@@ -76,7 +83,7 @@ RETRY_EVERY=3
 
   RESOLVEDIP=$(getent hosts github.com | awk '{ print $1 }')
   if [[ -z "$RESOLVEDIP" ]]; then msg_error "DNS Lookup Failure"; else msg_ok "DNS Resolved github.com to ${BL}$RESOLVEDIP${CL}"; fi
-  activate_err_handler
+
 
 # This function updates the Container OS by running apt-get update and upgrade
   msg_info "Updating Container OS"

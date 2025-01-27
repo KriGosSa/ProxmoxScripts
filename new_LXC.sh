@@ -390,7 +390,8 @@ export CT_LOGIN_PW=$LOGIN_PW
 IN_CONTAINER="set -o nounset
   $(<"$SCRIPT_DIR/colors_format_icons.sh")"
 IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR/error_handler.sh")"
+  $(<"$SCRIPT_DIR/error_handler.sh")
+    activate_err_handler"
 #IN_CONTAINER+="
 #  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
 IN_CONTAINER="$IN_CONTAINER
