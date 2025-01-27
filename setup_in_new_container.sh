@@ -45,7 +45,7 @@ echo ""
 #Do  ot wait for network during boot
   systemctl disable -q --now systemd-networkd-wait-online.service
   
-  msg_ok "Set up Container OS"
+  #msg_ok "Set up Container OS"
   msg_ok "Network Connected: ${BL}$(hostname -I)"
 
 # This function checks the network connection by pinging a known IP address and prompts the user to continue if the internet is not connected
