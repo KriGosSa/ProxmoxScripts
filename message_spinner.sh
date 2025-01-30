@@ -16,8 +16,14 @@ function spinner() {
   done
 }
 
-# This function displays an informational message with a yellow color.
+# This function displays a prpgress message with a yellow color.
 function msg_info() {
+  local msg="$1"
+  echo -e "${COLOR_YELLOW}${SPACE_HOLD}${msg}${SPACE_HOLD}"
+}
+
+# This function displays an informational message with a yellow color.
+function msg_progress() {
   local msg="$1"
   echo -ne "${INDENT}${COLOR_YELLOW}${SPACE_HOLD}${msg}${SPACE_HOLD}"
   spinner &

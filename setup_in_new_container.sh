@@ -86,7 +86,7 @@ echo ""
 
 
 # This function updates the Container OS by running apt-get update and upgrade
-  msg_info "Updating Container OS"
+  msg_progress "Updating Container OS"
    apt-get update
    apt-get -o Dpkg::Options::="--force-confold" -y dist-upgrade
    #see above
@@ -125,7 +125,7 @@ echo ""
   # Disable default MOTD scripts
   chmod -x /etc/update-motd.d/*
 
-msg_info "Cleaning up"
+msg_progress "Cleaning up"
  apt-get -y autoremove
  apt-get -y autoclean
 msg_ok "Cleaned"

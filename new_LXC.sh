@@ -321,11 +321,11 @@ fi
 #sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
 
 if pct status 102 | grep -Fq "stopped"; then
-msg_info "Starting LXC Container"
+msg_progress "Starting LXC Container"
 pct start "$CONTAINER_ID"
 msg_ok "Started LXC Container"
 else
-msg_info "Rebooting LXC Container"
+msg_progress "Rebooting LXC Container"
 pct reboot "$CONTAINER_ID"
 msg_ok "Rebooted LXC Container"
 fi
