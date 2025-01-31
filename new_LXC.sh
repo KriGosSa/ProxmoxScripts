@@ -272,9 +272,42 @@ MAP_TO_INVALID_HIGHER_START_UID=$((LOGIN_UID + 1))
 MAP_TO_INVALID_HIGHER_START_GID=$((LOGIN_GID + 1))
 MAP_TO_INVALID_HIGHER_CNT_UID=$((65535 - LOGIN_UID))
 MAP_TO_INVALID_HIGHER_CNT_GID=$((65535 - LOGIN_GID))
-cat <<EOF >>"$LXC_CONFIG"
+
+# Function to check and handle ID mappings
+check_id_mapping() {
+    local map_uid="$1"
+    local map_gid="$2"
+    local target_uid="$3"
+    local target_gid="$4"
+    
+    local existing_uid=$(grep "^lxc.idmap: u $map_uid" "$LXC_CONFIG" | awk '{print $4}')
+    local existing_gid=$(grep "^lxc.idmap: g $map_gid" "$LXC_CONFIG" | awk '{print $4}')
+
+    if [ -n "$existing_uid" ] || [ -n "$existing_gid" ]; then
+        if [ "$existing_uid" != "$target_uid" ] || [ "$existing_gid" != "$target_gid" ]; then
+            msg_warning "Existing mapping found with different target IDs:"
+            [ "$existing_uid" != "$target_uid" ] && echo -e "User ID: Existing=$existing_uid, Intended=$target_uid"
+            [ "$existing_gid" != "$target_gid" ] && echo -e "Group ID: Existing=$existing_gid, Intended=$target_gid"
+            if ! whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "DIFFERENT MAPPING" --yesno "Do you want to continue with the existing mapping?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH; then
+                msg_error "Aborted due to different mapping"
+                exit 1
+            fi
+        fi
+        return 1  # Mapping exists
+    fi
+    return 0  # No mapping exists
+}
+
+# Check root mapping and add if needed
+if check_id_mapping 0 0 "$ROOTMAP_UID" "$ROOTMAP_GID"; then
+    cat <<EOF >>"$LXC_CONFIG"
 lxc.idmap: u 0 $ROOTMAP_UID 1
 lxc.idmap: g 0 $ROOTMAP_GID 1
+EOF
+fi
+
+# Add remaining mappings
+cat <<EOF >>"$LXC_CONFIG"
 lxc.idmap: u 1 100000 $MAP_TO_INVALID_LOWER_UID
 lxc.idmap: g 1 100000 $MAP_TO_INVALID_LOWER_GID
 lxc.idmap: u $LOGIN_UID $LOGIN_UID 1
