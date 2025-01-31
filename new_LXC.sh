@@ -19,6 +19,8 @@ activate_err_handler
 source "$SCRIPT_DIR/message_spinner.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/password_validation.sh"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/usermap.func"
 
 CONTAINER_ID=""
 ROOTMAP_UNAME=""
@@ -273,48 +275,17 @@ MAP_TO_INVALID_HIGHER_START_GID=$((LOGIN_GID + 1))
 MAP_TO_INVALID_HIGHER_CNT_UID=$((65535 - LOGIN_UID))
 MAP_TO_INVALID_HIGHER_CNT_GID=$((65535 - LOGIN_GID))
 
-# Function to check and handle ID mappings
-check_id_mapping() {
-    local map_uid="$1"
-    local map_gid="$2"
-    local target_uid="$3"
-    local target_gid="$4"
-    
-    local existing_uid=$(grep "^lxc.idmap: u $map_uid" "$LXC_CONFIG" | awk '{print $4}')
-    local existing_gid=$(grep "^lxc.idmap: g $map_gid" "$LXC_CONFIG" | awk '{print $4}')
 
-    if [ -n "$existing_uid" ] || [ -n "$existing_gid" ]; then
-        if [ "$existing_uid" != "$target_uid" ] || [ "$existing_gid" != "$target_gid" ]; then
-            msg_warning "Existing mapping found with different target IDs:"
-            [ "$existing_uid" != "$target_uid" ] && echo -e "User ID: Existing=$existing_uid, Intended=$target_uid"
-            [ "$existing_gid" != "$target_gid" ] && echo -e "Group ID: Existing=$existing_gid, Intended=$target_gid"
-            if ! whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "DIFFERENT MAPPING" --yesno "Do you want to continue with the existing mapping?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH; then
-                msg_error "Aborted due to different mapping"
-                exit 1
-            fi
-        fi
-        return 1  # Mapping exists
-    fi
-    return 0  # No mapping exists
-}
 
 # Check root mapping and add if needed
-if check_id_mapping 0 0 "$ROOTMAP_UID" "$ROOTMAP_GID"; then
-    cat <<EOF >>"$LXC_CONFIG"
-lxc.idmap: u 0 $ROOTMAP_UID 1
-lxc.idmap: g 0 $ROOTMAP_GID 1
-EOF
-fi
-
-# Add remaining mappings
-cat <<EOF >>"$LXC_CONFIG"
-lxc.idmap: u 1 100000 $MAP_TO_INVALID_LOWER_UID
-lxc.idmap: g 1 100000 $MAP_TO_INVALID_LOWER_GID
-lxc.idmap: u $LOGIN_UID $LOGIN_UID 1
-lxc.idmap: g $LOGIN_GID $LOGIN_GID 1
-lxc.idmap: u $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_UID $MAP_TO_INVALID_HIGHER_CNT_UID
-lxc.idmap: g $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_GID $MAP_TO_INVALID_HIGHER_CNT_GID
-EOF
+map_id 0 "$ROOTMAP_UID" u 1
+map_id 0 "$ROOTMAP_GID" g 1
+map_id $LOGIN_UID $LOGIN_UID u 1
+map_id $LOGIN_GID $LOGIN_GID g 1
+map_id 1 100000 u $MAP_TO_INVALID_LOWER_UID
+map_id 1 100000 g $MAP_TO_INVALID_LOWER_GID
+map_id $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_UID u $MAP_TO_INVALID_HIGHER_CNT_UID
+map_id $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_GID g $MAP_TO_INVALID_HIGHER_CNT_GID
 
 
 SUBUID="/etc/subuid"
@@ -370,30 +341,15 @@ export CT_LOGIN_PW=$LOGIN_PW
 export CT_APPLICATION_TITLE=$APPLICATION_TITLE
 
 
-#IN_CONTAINER="set -o nounset
-#  $(envsubst < "$SCRIPT_DIR/colors_format_icons.sh")"
-#IN_CONTAINER="$IN_CONTAINER
-#  $(envsubst < "$SCRIPT_DIR/error_handler.sh")"
-#IN_CONTAINER+="
-#  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
-#IN_CONTAINER="$IN_CONTAINER
-#  $(envsubst < $SCRIPT_DIR/message_spinner.sh)"
-#IN_CONTAINER="$IN_CONTAINER
-#  $(envsubst < $SCRIPT_DIR/setup_in_new_container.sh)"
-
 IN_CONTAINER="set -o nounset
   $(<"$SCRIPT_DIR/colors_format_icons.sh")"
 IN_CONTAINER="$IN_CONTAINER
   $(<"$SCRIPT_DIR/error_handler.sh")
     activate_err_handler"
-#IN_CONTAINER+="
-#  trap 'error_handler "'$LINENO "$BASH_COMMAND"'"' ERR"
 IN_CONTAINER="$IN_CONTAINER
   $(<$SCRIPT_DIR/message_spinner.sh)"
 IN_CONTAINER="$IN_CONTAINER
   $(<$SCRIPT_DIR/setup_in_new_container.sh)"
 
-
-# lxc-attach -n "$CONTAINER_ID" -- bash -c "$(cat)" param1 "$CONTAINER_ID"
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
 

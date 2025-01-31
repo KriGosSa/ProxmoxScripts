@@ -1,0 +1,36 @@
+# Function to check and handle ID mappings
+check_id_mapping_not_exists() {
+    local map_id="$1"
+    local target_id="$2"
+    local type="$3"
+    local number_of_ids_to_map="$4"
+    
+    local existing_map=$(grep "^lxc.idmap: $type $map_id" "$LXC_CONFIG" | awk '{print $4}')
+
+    if [ -n "$existing_map" ]; then
+        if [ "$existing_map" != "$target_id" ] ; then
+            msg_warning "Existing mapping found with different target $(type)IDs:"
+            msg_warning "$(type)ID: Existing=$existing_map, Intended=$target_id"
+            if ! whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "DIFFERENT MAPPING" --yesno "Do you want to continue with the existing mapping?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH; then
+                msg_error "Aborted due to different mapping"
+                exit 1
+            fi
+        fi
+        return 1  # Mapping exists
+    fi
+    return 0  # No mapping exists
+}
+
+map_id{
+    local map_id="$1"
+    local target_id="$2"
+    local type="$3"
+    local number_of_ids_to_map="$4"
+    
+    ic check_id_mapping_not_exists $map_id $target_id $type $number_of_ids_to_map
+    
+    cat <<EOF >>"$LXC_CONFIG"
+lxc.idmap: $type $map_id $target_id $number_of_ids_to_map
+EOF
+fi
+}
