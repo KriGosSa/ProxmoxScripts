@@ -17,7 +17,7 @@
   BUFFER_CLEAR="\\r\\033[K"
   SPACE_HOLD=" "
   INDENT="  "
-  whiptailHeight=10
+  whiptailHeight=12
   whiptailWidth=72
 
   # Icons
