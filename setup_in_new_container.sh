@@ -17,7 +17,7 @@ else
   msg_info "Login-User $CT_LOGIN_UNAME already exist"
 fi
 
-echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd
+echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd -c SHA512
 
 
 RETRY_NUM=10
