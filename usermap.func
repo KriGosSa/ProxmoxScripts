@@ -27,7 +27,7 @@ map_id() {
     local type="$3"
     local number_of_ids_to_map="$4"
     
-    ic check_id_mapping_not_exists $map_id $target_id $type $number_of_ids_to_map
+    if check_id_mapping_not_exists $map_id $target_id $type $number_of_ids_to_map
     
     cat <<EOF >>"$LXC_CONFIG"
 lxc.idmap: $type $map_id $target_id $number_of_ids_to_map
