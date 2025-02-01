@@ -11,8 +11,8 @@ check_id_mapping_not_exists() {
 
     if [ -n "$existing_map" ]; then
         if [ "$existing_map" != "$target_id" ] ; then
-            local msg="Existing mapping found with different target $(type)IDs:\n
-            $INDENT $INDENT ${type}ID: Existing=${existing_map}, Intended=${target_id}"
+            local msg="Existing mapping found with different target for ${type}IDs $map_id:
+            ${type}ID: Existing=${existing_map}, Intended=${target_id}"
             msg_warning "$msg"
             
             if ! whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "DIFFERENT MAPPING" --yesno "$msg \n Do you want to continue with the existing mapping?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH; then
