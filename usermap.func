@@ -21,7 +21,7 @@ check_id_mapping_not_exists() {
     return 0  # No mapping exists
 }
 
-map_id{
+map_id() {
     local map_id="$1"
     local target_id="$2"
     local type="$3"
