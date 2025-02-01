@@ -5,7 +5,9 @@ check_id_mapping_not_exists() {
     local type="$3"
     local number_of_ids_to_map="$4"
     
-    local existing_map=$(grep "^lxc.idmap: $type $map_id" "$LXC_CONFIG" | awk '{print $4}')
+    
+    #$(grep "^lxc.idmap: u 0" "$LXC_CONFIG" | head -n 1 | awk '{print $4}')
+    local existing_map=$(grep "^lxc.idmap: $type $map_id" "$LXC_CONFIG" | head -n 1 | awk '{print $4}')
 
     if [ -n "$existing_map" ]; then
         if [ "$existing_map" != "$target_id" ] ; then
