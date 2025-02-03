@@ -7,11 +7,11 @@ My personal Proxmox Helper Scripts inspired by the [Proxmox community scripts](h
 
 **Proxmox Scripts** is a collection of tools to simplify the setup and management of Proxmox Virtual Environment (VE). This is to simplify reoccurring tasks or create own versions of existing scripts
 
-—
 
 ## 📦 Features
  
-—
+— Complete setup of a new container (map root user, create login user, disable root shell in container, create volume mapping with corresponding access rights)
+- Updater/Installer with single download: easily check what you get in advance
 
 ## ✅ Requirements
 
@@ -21,7 +21,6 @@ Ensure your system meets the following prerequisites:
 - **Linux**: Compatible with most distributions
 - **Dependencies**: bash and curl should be installed.
 
-—
 
 ## 🚀 Installation / Updates
 
@@ -29,7 +28,9 @@ To install clone the repo or run the following  ommand
 
 https://raw.githubusercontent.com/KriGosSa/ProxmoxScripts/refs/heads/main/setup.sh
 
-—
+```bash
+bash -c “$(wget -qLO - https://github.com/KriGosSa/ProxmoxScripts/raw/main/install.func) install”
+
 
 
 ## 🤝 Report a Bug or Feature Request
