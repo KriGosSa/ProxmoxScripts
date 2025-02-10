@@ -1,4 +1,4 @@
 #!/bin/bash
-function install() {
+function install_script() {
 echo "test successful"
 }
