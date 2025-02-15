@@ -12,7 +12,7 @@ local install_current_folder=$1
   whiptailWidth=72
   
 current_folder=$(pwd)
-if $install_current_folder = true
+if [[ $install_current_folder == true ]]; then
   local install_dir="$current_folder"
 else 
   local install_dir=" "
