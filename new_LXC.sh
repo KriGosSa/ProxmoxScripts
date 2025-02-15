@@ -218,7 +218,7 @@ if status "$CONTAINER_ID" &>/dev/null; then
 fi
 
 if [ -z "$CONTAINER_MOUNT" ]; then
-  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Mount folder" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_MOUNT" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit

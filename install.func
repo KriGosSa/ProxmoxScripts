@@ -1,4 +1,47 @@
 #!/bin/bash
+
 function install_script() {
-echo "test successful"
+#make script fail, when expandimg uninitialized variables
+set -o nounset
+
+
+  whiptailHeight=12
+  whiptailWidth=72
+  
+current_folder=$(pwd)
+
+if [ -z "$install_dir" ]; then
+  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH "$current_folder" --title "Install directory" 3>&1 1>&2 2>&3); then
+    if [ -z "$install_dir" ]; then
+      msg_error "No installation directory provided"
+      exit
+    fi
+  else
+    exit
+  fi
+fi
+
+#if path does not exist: create it
+if [ ! -d "$install_dir" ]; then
+  mkdir "$install_dir"
+  cd "$install_dir"
+else
+cd "$install_dir"
+if [[ -f "$install_dir/*" ]]; then
+  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Cleanup Install directory" 3>&1 1>&2 2>&3); then
+    #create folder starting woith archive_ and then a random steing
+    archivedir=$(mktemp -d archive_XXXXXXXXXXX)
+    #move all files (except those starting with archive) intomthe new folder
+    ls | grep -v '^archive' | xargs mv -t "$archivedir"
+fi 
+fi
+fi
+
+
+
+#download and unzip file
+wget https://github.com/KriGosSa/ProxmoxScripts/archive/refs/heads/main.tar.gz
+#--strip-components=1 will prevent the folder (=repository) from beimg creatwd
+tar --strip-components=1  -xvf main.tar.gz
+rm main.tar.gz
 }
