@@ -4,7 +4,7 @@ function install_script() {
 #make script fail, when expandimg uninitialized variables
 set -o nounset
 
-local install_current_folder=$1
+local install_current_folder="$1"
 
 
 
@@ -14,7 +14,9 @@ local install_current_folder=$1
 current_folder=$(pwd)
 if [[ $install_current_folder == true ]]; then
   local install_dir="$current_folder"
+  
 else 
+
   local install_dir=" "
 fi 
 
