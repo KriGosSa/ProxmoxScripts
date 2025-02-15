@@ -17,7 +17,7 @@ if [[ $install_current_folder == true ]]; then
   
 else 
 
-  local install_dir=" "
+  local install_dir=""
 fi 
 
 if [ -z "$install_dir" ]; then
