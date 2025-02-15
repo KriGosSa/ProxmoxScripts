@@ -4,7 +4,7 @@ function install_script() {
 #make script fail, when expandimg uninitialized variables
 set -o nounset
 
-local install_current_folder="$1"
+local install_current_folder="${1:-}"
 
 
 
