@@ -14,6 +14,7 @@ local install_current_folder=$1
 current_folder=$(pwd)
 if $install_current_folder = true
   local install_dir="$current_folder"
+else local instll_dir="" 
 fi 
 
 if [ -z "$install_dir" ]; then
