@@ -23,7 +23,7 @@ fi
 
 if [ -z "$install_dir" ]; then
 
-  if install_dir=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH "$current_folder" --title "Install directory" 3>&1 1>&2 2>&3); then
+  if install_dir=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" whiptailHeight whiptailWidth "$current_folder" --title "Install directory" 3>&1 1>&2 2>&3); then
     if [ -z "$install_dir" ]; then
       echo "No installation directory provided"
       exit
@@ -40,7 +40,7 @@ if [ ! -d "$install_dir" ]; then
 else
 cd "$install_dir"
 if [[ -f "$install_dir/*" ]]; then
-  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Cleanup Install directory" 3>&1 1>&2 2>&3); then
+  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder?" whiptailHeight whiptailWidth --title "Cleanup Install directory" 3>&1 1>&2 2>&3); then
     #create folder starting woith archive_ and then a random steing
     archivedir=$(mktemp -d archive_XXXXXXXXXXX)
     #move all files (except those starting with archive) intomthe new folder
