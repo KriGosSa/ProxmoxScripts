@@ -20,10 +20,11 @@ else
 
   local install_dir=""
 fi 
-
+echo "Test0"
 if [ -z "$install_dir" ]; then
-
+echo "Test1"
   if install_dir=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" whiptailHeight whiptailWidth "$current_folder" --title "Install directory" 3>&1 1>&2 2>&3); then
+    echo "Test2"
     if [ -z "$install_dir" ]; then
       echo "No installation directory provided"
       exit
