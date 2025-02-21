@@ -34,7 +34,7 @@ source <(wget -qLO - https://github.com/KriGosSa/ProxmoxScripts/raw/main/install
 
 
 <div class=“code-box”>
-  <pre><code id=“codeBlock”>bash -c “$(wget -qLO - https://github.com/KriGosSa/ProxmoxScripts/raw/main/install.func) install”</code></pre>
+  <pre><code id=“codeBlock”>bash -c “$(wget -qLO - --no-cache --no-hsts https://github.com/KriGosSa/ProxmoxScripts/raw/main/install.func) install”</code></pre>
   <button class=“copy-btn” onclick=“copyToClipboard()”>Copy</button>
 </div>
 
