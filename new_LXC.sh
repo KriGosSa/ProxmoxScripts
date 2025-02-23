@@ -11,14 +11,14 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 #source $SCRIPT_DIR/host_functions.sh
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/colors_format_icons.sh"
+source "$SCRIPT_DIR/colors_format_icons.func"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/error_handler.sh"
+source "$SCRIPT_DIR/error_handler.func"
 activate_err_handler
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/message_spinner.sh"
+source "$SCRIPT_DIR/message_spinner.func"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/password_validation.sh"
+source "$SCRIPT_DIR/password_validation.func"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/usermap.func"
 
@@ -342,14 +342,14 @@ export CT_APPLICATION_TITLE=$APPLICATION_TITLE
 
 
 IN_CONTAINER="set -o nounset
-  $(<"$SCRIPT_DIR/colors_format_icons.sh")"
+  $(<"$SCRIPT_DIR/colors_format_icons.func")"
 IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR/error_handler.sh")
+  $(<"$SCRIPT_DIR/error_handler.func")
     activate_err_handler"
 IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR"/message_spinner.sh)"
+  $(<"$SCRIPT_DIR"/message_spinner.func)"
 IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR"/setup_in_new_container.sh)"
+  $(<"$SCRIPT_DIR"/setup_in_new_container.func)"
 
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
 
