@@ -51,7 +51,6 @@ fi
 
 
 #download and unzip file (q = quiet, O = download to stdout
-#--strip-components=1 will prevent the folder (=repository) from beimg creatwd
-wget -qO - --no-cache --no-hsts https://github.com/KriGosSa/ProxmoxScripts/archive/refs/heads/main.tar.gz | tar --strip-components=1  -xvf
-rm main.tar.gz
+#--strip-components=1 will prevent the folder (=repository) from beimg creatwd / -x = extract
+wget -qO - --no-cache --no-hsts https://github.com/KriGosSa/ProxmoxScripts/archive/refs/heads/main.tar.gz | tar --strip-components=1  -x
 }
