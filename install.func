@@ -39,7 +39,7 @@ if [ ! -d "$install_dir" ]; then
 else
 cd "$install_dir" || exit
 
-if ls -A "$install_dir")" | grep -v '^archive' > /dev/null; then
+if ls -A "$install_dir" | grep -v '^archive' > /dev/null; then
   #echo "There are files not starting with 'archive'."
   if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then
     #create folder starting with archive_ and then a random string
