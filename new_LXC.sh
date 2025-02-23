@@ -241,7 +241,7 @@ if [[ $TEST == true ]]; then
 fi
 
 if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
-  adduser $ROOTMAP_UNAME --shell /bin/false --disabled-login --system --comment "root in container $CONTAINER_ID" --no-create-home
+  adduser "$ROOTMAP_UNAME" --shell /bin/false --disabled-login --system --comment "root in container $CONTAINER_ID" --no-create-home
 
   ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
   if [ -z "$ROOTMAP_UID" ]; then
@@ -280,8 +280,8 @@ MAP_TO_INVALID_HIGHER_CNT_GID=$((65535 - LOGIN_GID))
 # Check root mapping and add if needed
 map_id 0 "$ROOTMAP_UID" u 1
 map_id 0 "$ROOTMAP_GID" g 1
-map_id $LOGIN_UID $LOGIN_UID u 1
-map_id $LOGIN_GID $LOGIN_GID g 1
+map_id "$LOGIN_UID" "$LOGIN_UID" u 1
+map_id "$LOGIN_GID" "$LOGIN_GID" g 1
 map_id 1 100000 u $MAP_TO_INVALID_LOWER_UID
 map_id 1 100000 g $MAP_TO_INVALID_LOWER_GID
 map_id $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_UID u $MAP_TO_INVALID_HIGHER_CNT_UID
@@ -347,9 +347,9 @@ IN_CONTAINER="$IN_CONTAINER
   $(<"$SCRIPT_DIR/error_handler.sh")
     activate_err_handler"
 IN_CONTAINER="$IN_CONTAINER
-  $(<$SCRIPT_DIR/message_spinner.sh)"
+  $(<"$SCRIPT_DIR"/message_spinner.sh)"
 IN_CONTAINER="$IN_CONTAINER
-  $(<$SCRIPT_DIR/setup_in_new_container.sh)"
+  $(<"$SCRIPT_DIR"/setup_in_new_container.sh)"
 
 lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
 
