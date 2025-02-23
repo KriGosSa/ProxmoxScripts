@@ -29,7 +29,7 @@ To install clone the repo or run the following  ommand
 https://raw.githubusercontent.com/KriGosSa/ProxmoxScripts/refs/heads/main/setup.sh
 
 ```bash
-source <(wget -qLO - https://github.com/KriGosSa/ProxmoxScripts/raw/main/install.func) && install_script
+source <(wget -qLO - —no-cache —no-hsts https://github.com/KriGosSa/ProxmoxScripts/raw/main/install.func) && install_script
 ```
 
 
