@@ -24,12 +24,12 @@ CHOICE=$(whiptail --title "Proxmox helper scripts - Script Selector" --menu "Cho
 # Execute the corresponding script based on user input using bash
 case $CHOICE in
     1)
-        bash "$SCRIPT_DIR/new_lxc.sh"
-        ;;
-    2)
         pushd "$SCRIPT_DIR" >/dev/null
         install_script true
         popd >/dev/null
+        ;;
+    2)
+        bash "$SCRIPT_DIR/new_lxc.sh"
         ;;
     3)
         bash "$SCRIPT_DIR/install_homebridge.sh"
