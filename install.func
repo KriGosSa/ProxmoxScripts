@@ -7,7 +7,6 @@ set -o nounset
 local install_current_folder="${1:-}"
 
 
-
   local whiptailHeight=12
   local whiptailWidth=72
   local WHIPTAIL_BACKTITLE="WP Title"
@@ -41,11 +40,13 @@ cd "$install_dir" || exit
 
 if ls -A "$install_dir" | grep -v '^archive' > /dev/null; then
   #echo "There are files not starting with 'archive'."
-  if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then
+  if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder (else update will be cancelled)?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then
     #create folder starting with archive_ and then a random string
     archivedir=$(mktemp -d archive_XXXXXXXXXXX)
     #move all files (except those starting with archive) into the new folder
     ls | grep -v '^archive' | xargs mv -t "$archivedir"
+  else
+    exit
   fi
 fi
 fi
@@ -55,4 +56,7 @@ fi
 #download and unzip file (q = quiet, O = download to stdout
 #--strip-components=1 will prevent the folder (=repository) from beimg creatwd / -x = extract
 wget -qO - --no-cache --no-hsts https://github.com/KriGosSa/ProxmoxScripts/archive/refs/heads/main.tar.gz | tar --strip-components=1  -xz
+chmod +x start.sh
+chmod +x new_lxc.sh
+chmod +x install_homebridge.sh
 }
