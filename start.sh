@@ -9,9 +9,9 @@ set -o nounset
 #which is then used as argument for source command
 #source loads content of specified file into current shell
 SCRIPT_DIR=$(dirname "$0")
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/colors_format_icons.func"
 source "$SCRIPT_DIR/colors_format_icons.func"
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/install.func"
 source "$SCRIPT_DIR/install.func"
 
 # Using whiptail to create a menu
