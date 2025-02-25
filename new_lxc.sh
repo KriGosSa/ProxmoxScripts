@@ -84,8 +84,8 @@ fi
 #We cannot test for SSh as SUDO will clear the variable SSH_CLIENT
 # This function checks if the script is running through SSH and prompts the user to confirm if they want to proceed or exit.
 #  if [ -n "${SSH_CLIENT:+x}" ]; then
-#    if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $whiptailHeight $WHIPTAIL_WIDTH; then
-#      whiptail --backtitle "$WHIPTAIL_BACKTITLE" --msgbox --title "Proceed using SSH" "You've chosen to proceed using SSH. If any issues arise, please run the script in the Proxmox shell before creating a repository issue." $whiptailHeight $WHIPTAIL_WIDTH
+#    if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $whiptailHeight $whiptailWidth; then
+#      whiptail --backtitle "$WHIPTAIL_BACKTITLE" --msgbox --title "Proceed using SSH" "You've chosen to proceed using SSH. If any issues arise, please run the script in the Proxmox shell before creating a repository issue." $whiptailHeight $whiptailWidth
 #    else
 #      clear
 #      echo "Exiting due to SSH usage. Please consider using the Proxmox shell."
@@ -95,7 +95,7 @@ fi
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
 if [ -z "$containerId" ]; then
-  if containerId=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if containerId=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$containerId" ]; then
       msg_error "Container ID is mandatory"
       exit
@@ -115,7 +115,7 @@ fi
 
 
 if [ -z "$applicationTitle" ]; then
-  if applicationTitle=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if applicationTitle=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$containerId" ]; then
       msg_info "No application title provided"
       exit
@@ -130,7 +130,7 @@ fi
 #  Example: lxc_docker_unifi_network_app
 
 if [ -z "$rootmapUname" ]; then
-  if rootmapUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if rootmapUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" "$whiptailHeight" "$whiptailWidth" --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$rootmapUname" ]; then
       msg_error "Rootmap User is mandatory"
       exit
@@ -143,7 +143,7 @@ if [ -z "$rootmapUname" ]; then
 fi
 
 if [ -z "$loginUname" ]; then
-  if loginUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if loginUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" "$whiptailHeight" "$whiptailWidth" --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$loginUname" ]; then
       msg_error "Login User is mandatory"
       exit
@@ -155,12 +155,12 @@ if [ -z "$loginUname" ]; then
   fi
 fi
 
-if LOGIN_UID=$(getent passwd "$loginUname" | cut -f 3 -d ":"); then
-  if [ -z "$LOGIN_UID" ]; then
+if loginUid=$(getent passwd "$loginUname" | cut -f 3 -d ":"); then
+  if [ -z "$loginUid" ]; then
     msg_error "Unable to determine User ID of login user on the host"
     exit
   else
-    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user ID: ${COLOR_BRIGHT_GREEN}$LOGIN_UID${COLOR_RESET}"
+    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user ID: ${COLOR_BRIGHT_GREEN}$loginUid${COLOR_RESET}"
   fi
 else
   msg_error "Failed to determine User ID of login user on the host"
@@ -180,20 +180,20 @@ else
 fi
 
 while true; do
-  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $whiptailHeight $WHIPTAIL_WIDTH --title "Login password" 3>&1 1>&2 2>&3); then
+  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" "$whiptailHeight" "$whiptailWidth" --title "Login password" 3>&1 1>&2 2>&3); then
     if [[ -n "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
-        whiptail --msgbox "Password cannot contain spaces. Please try again." $whiptailHeight $WHIPTAIL_WIDTH
+        whiptail --msgbox "Password cannot contain spaces. Please try again." "$whiptailHeight" "$whiptailWidth"
       elif ! validate_password "$LOGIN_PW1"; then
-        whiptail --msgbox "Password must meat the complexity criteria. Please try again." $whiptailHeight $WHIPTAIL_WIDTH
+        whiptail --msgbox "Password must meat the complexity criteria. Please try again." "$whiptailHeight" "$whiptailWidth"
       else
-        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" $whiptailHeight $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" "$whiptailHeight" "$whiptailWidth" --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
             LOGIN_PW="-password $LOGIN_PW1"
             echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
             break
           else
-            whiptail --msgbox "Passwords do not match. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+            whiptail --msgbox "Passwords do not match. Please try again." "$WHIPTAIL_HEIGHT" "$whiptailWidth"
           fi
         else
           exit_script
@@ -215,7 +215,7 @@ if status "$containerId" &>/dev/null; then
 fi
 
 if [ -z "$containerMount" ]; then
-  if containerMount=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Mount folder" 3>&1 1>&2 2>&3); then
+  if containerMount=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" "$WHIPTAIL_HEIGHT" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
     if [ -z "$containerMount" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit

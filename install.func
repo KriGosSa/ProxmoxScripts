@@ -5,24 +5,20 @@ function install_script() {
 set -o nounset
 
 local install_current_folder="${1:-}"
+local whiptailHeight=12
+local whiptailWidth=72
+local WHIPTAIL_BACKTITLE="WP Title"
 
-
-  local whiptailHeight=12
-  local whiptailWidth=72
-  local WHIPTAIL_BACKTITLE="WP Title"
-  
-current_folder=$(pwd)
+local currentFolder=$(pwd)
 if [[ $install_current_folder == true ]]; then
-  local install_dir="$current_folder"
-  
+  local installDir="$currentFolder"
 else 
-
-  local install_dir=""
+  local installDir=""
 fi 
 
-if [ -z "$install_dir" ]; then
-  if install_dir=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" $whiptailHeight $whiptailWidth "$current_folder" --title "Install directory" 3>&1 1>&2 2>&3); then
-    if [ -z "$install_dir" ]; then
+if [ -z "$installDir" ]; then
+  if installDir=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" $whiptailHeight $whiptailWidth "$currentFolder" --title "Install directory" 3>&1 1>&2 2>&3); then
+    if [ -z "$installDir" ]; then
       echo "No installation directory provided"
       exit
     fi
@@ -32,13 +28,13 @@ if [ -z "$install_dir" ]; then
 fi
 
 #if path does not exist: create it
-if [ ! -d "$install_dir" ]; then
-  mkdir "$install_dir"
-  cd "$install_dir" || exit
+if [ ! -d "$installDir" ]; then
+  mkdir "$installDir"
+  cd "$installDir" || exit
 else
-cd "$install_dir" || exit
+cd "$installDir" || exit
 
-if ls -A "$install_dir" | grep -v '^archive' > /dev/null; then
+if ls -A "$installDir" | grep -v '^archive' > /dev/null; then
   #echo "There are files not starting with 'archive'."
   if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder (else update will be cancelled)?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then
     #create folder starting with archive_ and then a random string

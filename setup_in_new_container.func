@@ -20,21 +20,21 @@ fi
 echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd -c SHA512
 
 
-RETRY_NUM=10
-RETRY_EVERY=3
+local retryNum=10
+local retryEvery=3
 
 # This function sets up the Container OS by generating the locale, setting the timezone, and checking the network connection
 
 echo ""
-  for ((i = RETRY_NUM; i > 0; i--)); do
+  for ((i = retryNum; i > 0; i--)); do
     if [ "$(hostname -I)" != "" ]; then
       break
     fi
     echo 1>&2 -en "${ICON_CROSS}${COLOR_RED} No Network! "
-    sleep $RETRY_EVERY
+    sleep $retryEvery
   done
   if [ "$(hostname -I)" = "" ]; then
-    echo 1>&2 -e "\n${ICON_CROSS}${COLOR_RED} No Network After $RETRY_NUM Tries${COLOR_RESET}"
+    echo 1>&2 -e "\n${ICON_CROSS}${COLOR_RED} No Network After $retryNum Tries${COLOR_RESET}"
     echo -e "${ICON_NETWORK}Check Network Settings"
     exit 1
   fi

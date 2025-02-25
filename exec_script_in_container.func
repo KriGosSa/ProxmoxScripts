@@ -1,20 +1,20 @@
 function exec_in_lxc() {
 local script="${1}" #script is a mandatory parameter
-local containerID="${2:-}"
+local containerId="${2:-}"
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
-if [ -z "$containerID" ]; then
-  if containerID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
-    if [ -z "containerID" ]; then
+if [ -z "$containerId" ]; then
+  if containerId=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+    if [ -z "containerId" ]; then
       msg_error "Container ID is mandatory"
       exit
     else
       # Test if ID is valid
-      if [ "$containerID" -lt "100" ]; then
+      if [ "$containerId" -lt "100" ]; then
         msg_error "ID cannot be less than 100."
         exit
       else
-        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$containerID${COLOR_RESET}"
+        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$containerId${COLOR_RESET}"
       fi
     fi
   else
@@ -27,19 +27,19 @@ fi
 #$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script,
 #which is then used as argument for source command
 #source loads content of specified file into current shell
-SCRIPT_DIR=$(dirname "$0")
+local scriptDir=$(dirname "$0")
 
 inContainer="set -o nounset
-  $(<"$SCRIPT_DIR/colors_format_icons.func")
+  $(<"$scriptDir/colors_format_icons.func")
 #inContainer="$inContainer
-  $(<"$SCRIPT_DIR/error_handler.func")
+  $(<"$scriptDir/error_handler.func")
     activate_err_handler
 #inContainer="$inContainer
-  $(<"$SCRIPT_DIR/message_spinner.func")
+  $(<"$scriptDir/message_spinner.func")
 #inContainer="$inContainer
-  $(<"${SCRIPT_DIR}/${script}")"
+  $(<"${scriptDir}/${script}")"
 
-lxc-attach -n "containerID" -- bash -c "$inContainer" 
+lxc-attach -n "containerId" -- bash -c "$inContainer" 
 
 
 }

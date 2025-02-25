@@ -1,9 +1,9 @@
 #!/bin/bash
 # This function displays a spinner.
-SPINNER_PID=""
+local spinnerPid=""
 function start_spinner() {
   local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-  local spin_i=0
+  local spinI=0
   local interval=0.1
   #hide cursor
   printf "\e[?25l" 
@@ -11,14 +11,14 @@ function start_spinner() {
   local color="${COLOR_BRIGHT_YELLOW}"
 
   while true; do
-    printf "\r ${color}%s${COLOR_RESET}" "${frames[spin_i]}"
-    spin_i=$(( (spin_i + 1) % ${#frames[@]} ))
+    printf "\r ${color}%s${COLOR_RESET}" "${frames[spinI]}"
+    spinI=$(( (spinI + 1) % ${#frames[@]} ))
     sleep "$interval"
   done
 }
 
 function kill_spinner() {
-  if [ -n "$SPINNER_PID" ] && ps -p "$SPINNER_PID" > /dev/null; then kill "$SPINNER_PID" > /dev/null; fi
+  if [ -n "$spinnerPid" ] && ps -p "$spinnerPid" > /dev/null; then kill "$spinnerPid" > /dev/null; fi
   #Spinner hides the cursor, make it visible again
   printf "\e[?25h"
 }
@@ -35,7 +35,7 @@ function msg_progress() {
   # -n means no new line at the end (progress msgs are therefore transient)
   echo -ne "${INDENT}${COLOR_YELLOW}${SPACE_HOLD}${msg}${SPACE_HOLD}"
   start_spinner &
-  SPINNER_PID=$!
+  spinnerPid=$!
 }
 
 # This function displays a success message with a green color.

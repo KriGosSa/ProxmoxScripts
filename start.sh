@@ -16,7 +16,7 @@ source "$SCRIPT_DIR/install.func"
 
 # Using whiptail to create a menu
 scriptCount=3
-CHOICE=$(whiptail --title "Proxmox helper scripts - Script Selector" --menu "Choose an option" $whiptailHeight $whiptailWidth $scriptCount \
+CHOICE=$(whiptail --title "Proxmox helper scripts - Script Selector" --menu "Choose an option" "$whiptailHeight" "$whiptailWidth" $scriptCount \
 "1" "Install / Update helper scripts" \
 "2" "Complete the setup of a new lxc container" \
 "3" "Install homebridge in an lxc container" 3>&1 1>&2 2>&3)
