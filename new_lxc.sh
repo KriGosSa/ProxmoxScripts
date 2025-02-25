@@ -20,32 +20,33 @@ source "$SCRIPT_DIR/password_validation.func"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/usermap.func"
 
-CONTAINER_ID=""
-ROOTMAP_UNAME=""
-LOGIN_UNAME=""
-CONTAINER_MOUNT=""
-APPLICATION_TITLE=""
-TEST=false
+containerId=""
+rootmapUname=""
+loginUname=""
+containerMount=""
+applicationTitle=""
+test=false
+spinnerPid=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
   --containerid=* | -containerid=*)
-    CONTAINER_ID="${1#*=}"
+    containerId="${1#*=}"
     ;;
   --rootmapuname=* | -rootmapuname=*)
-    ROOTMAP_UNAME="${1#*=}"
+    rootmapUname="${1#*=}"
     ;;
   --loginuname=* | -loginuname=*)
-    LOGIN_UNAME="${1#*=}"
+    loginUname="${1#*=}"
     ;;
   --mount=* | -mount=*)
-    CONTAINER_MOUNT="${1#*=}"
+    containerMount="${1#*=}"
     ;;
   --apptitle=* | -apptitle=*)
-    APPLICATION_TITLE="${1#*=}"
+    applicationTitle="${1#*=}"
     ;;
   --test | -test)
-    TEST=true
+    test=true
     ;;
   *)
     printf "***************************\n"
@@ -93,18 +94,18 @@ fi
 #  fi
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
-if [ -z "$CONTAINER_ID" ]; then
-  if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
-    if [ -z "$CONTAINER_ID" ]; then
+if [ -z "$containerId" ]; then
+  if containerId=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+    if [ -z "$containerId" ]; then
       msg_error "Container ID is mandatory"
       exit
     else
       # Test if ID is valid
-      if [ "$CONTAINER_ID" -lt "100" ]; then
+      if [ "$containerId" -lt "100" ]; then
         msg_error "ID cannot be less than 100."
         exit
       else
-        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$CONTAINER_ID${COLOR_RESET}"
+        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$containerId${COLOR_RESET}"
       fi
     fi
   else
@@ -113,9 +114,9 @@ if [ -z "$CONTAINER_ID" ]; then
 fi
 
 
-if [ -z "$APPLICATION_TITLE" ]; then
-  if APPLICATION_TITLE=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
-    if [ -z "$CONTAINER_ID" ]; then
+if [ -z "$applicationTitle" ]; then
+  if applicationTitle=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+    if [ -z "$containerId" ]; then
       msg_info "No application title provided"
       exit
     fi
@@ -128,33 +129,33 @@ fi
 #_<<compose-project>>_<<container>> for users in docker container
 #  Example: lxc_docker_unifi_network_app
 
-if [ -z "$ROOTMAP_UNAME" ]; then
-  if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
-    if [ -z "$ROOTMAP_UNAME" ]; then
+if [ -z "$rootmapUname" ]; then
+  if rootmapUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+    if [ -z "$rootmapUname" ]; then
       msg_error "Rootmap User is mandatory"
       exit
     else
-      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Root will be mapped to host user name: ${COLOR_BRIGHT_GREEN}$ROOTMAP_UNAME${COLOR_RESET}"
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Root will be mapped to host user name: ${COLOR_BRIGHT_GREEN}$rootmapUname${COLOR_RESET}"
     fi
   else
     exit
   fi
 fi
 
-if [ -z "$LOGIN_UNAME" ]; then
-  if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
-    if [ -z "$LOGIN_UNAME" ]; then
+if [ -z "$loginUname" ]; then
+  if loginUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+    if [ -z "$loginUname" ]; then
       msg_error "Login User is mandatory"
       exit
     else
-      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login User Name: ${COLOR_BRIGHT_GREEN}$LOGIN_UNAME${COLOR_RESET}"
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login User Name: ${COLOR_BRIGHT_GREEN}$loginUname${COLOR_RESET}"
     fi
   else
     exit
   fi
 fi
 
-if LOGIN_UID=$(getent passwd "$LOGIN_UNAME" | cut -f 3 -d ":"); then
+if LOGIN_UID=$(getent passwd "$loginUname" | cut -f 3 -d ":"); then
   if [ -z "$LOGIN_UID" ]; then
     msg_error "Unable to determine User ID of login user on the host"
     exit
@@ -166,7 +167,7 @@ else
   exit
 fi
 
-if LOGIN_GID=$(getent passwd "$LOGIN_UNAME" | cut -f 4 -d ":"); then
+if LOGIN_GID=$(getent passwd "$loginUname" | cut -f 4 -d ":"); then
   if [ -z "$LOGIN_GID" ]; then
     msg_error "Unable to determine Group ID of login user on the host"
     exit
@@ -206,28 +207,28 @@ done
 
 
 # Test if ID is in use
-if status "$CONTAINER_ID" &>/dev/null; then
-  echo -e "ID '$CONTAINER_ID' does not exist."
-  unset CONTAINER_ID
+if status "$containerId" &>/dev/null; then
+  echo -e "ID '$containerId' does not exist."
+  unset containerId
   msg_error "Cannot use ID that is not created"
   exit
 fi
 
-if [ -z "$CONTAINER_MOUNT" ]; then
-  if CONTAINER_MOUNT=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Mount folder" 3>&1 1>&2 2>&3); then
-    if [ -z "$CONTAINER_MOUNT" ]; then
+if [ -z "$containerMount" ]; then
+  if containerMount=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Mount folder" 3>&1 1>&2 2>&3); then
+    if [ -z "$containerMount" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit
     else
-      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Folder to be mounted into container: ${COLOR_BRIGHT_GREEN}$CONTAINER_MOUNT${COLOR_RESET}"
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Folder to be mounted into container: ${COLOR_BRIGHT_GREEN}$containerMount${COLOR_RESET}"
     fi
   else
     exit
   fi
 fi
 
-LXC_CONFIG=/etc/pve/lxc/${CONTAINER_ID}.conf
-if [[ $TEST == true ]]; then
+LXC_CONFIG=/etc/pve/lxc/${containerId}.conf
+if [[ $test == true ]]; then
   LXC_CONFIG_TEST="${LXC_CONFIG}.test"
   if [ -d "$LXC_CONFIG_TEST" ]; then
     rm "$LXC_CONFIG_TEST"
@@ -236,10 +237,10 @@ if [[ $TEST == true ]]; then
   LXC_CONFIG="$LXC_CONFIG_TEST"
 fi
 
-if ! ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":"); then
-  adduser "$ROOTMAP_UNAME" --shell /bin/false --disabled-login --system --comment "root in container $CONTAINER_ID" --no-create-home
+if ! ROOTMAP_UID=$(getent passwd "$rootmapUname" | cut -f 3 -d ":"); then
+  adduser "$rootmapUname" --shell /bin/false --disabled-login --system --comment "root in container $containerId" --no-create-home
 
-  ROOTMAP_UID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 3 -d ":")
+  ROOTMAP_UID=$(getent passwd "$rootmapUname" | cut -f 3 -d ":")
   if [ -z "$ROOTMAP_UID" ]; then
     msg_error "Unable to determine User ID of rootmap user on the host after creation"
     exit
@@ -250,17 +251,17 @@ else
     exit
   fi
 fi
-ROOTMAP_GID=$(getent passwd "$ROOTMAP_UNAME" | cut -f 4 -d ":")
+ROOTMAP_GID=$(getent passwd "$rootmapUname" | cut -f 4 -d ":")
 if [ -z "$ROOTMAP_GID" ]; then
   msg_error "Unable to determine Group ID of rootmap user on the host after creation"
   exit
 fi
 
 # Create mount folder for compose-project in /data/docker
-if [ ! -d "$CONTAINER_MOUNT" ]; then
-  mkdir "$CONTAINER_MOUNT"
+if [ ! -d "$containerMount" ]; then
+  mkdir "$containerMount"
 fi
-chown -c "$ROOTMAP_UNAME":"$LOGIN_UNAME" -R "$CONTAINER_MOUNT"
+chown -c "$rootmapUname":"$loginUname" -R "$containerMount"
 
 #cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
 #https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
@@ -285,7 +286,7 @@ map_id $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_GID g $MA
 
 
 SUBUID="/etc/subuid"
-if [[ $TEST == true ]]; then
+if [[ $test == true ]]; then
   SUBUID_TEST="./subuid.test"
   if [ -d "$SUBUID_TEST" ]; then
     rm "$SUBUID_TEST"
@@ -296,7 +297,7 @@ fi
 
 
 SUBGID="/etc/subgid"
-if [[ $TEST == true ]]; then
+if [[ $test == true ]]; then
   SUBGID_TEST="./subgid.test"
   if [ -d "$SUBGID_TEST" ]; then
     rm "$SUBGID_TEST"
@@ -322,19 +323,19 @@ fi
 
 if pct status 102 | grep -Fq "stopped"; then
 msg_progress "Starting LXC Container"
-pct start "$CONTAINER_ID"
+pct start "$containerId"
 msg_ok "Started LXC Container"
 else
 msg_progress "Rebooting LXC Container"
-pct reboot "$CONTAINER_ID"
+pct reboot "$containerId"
 msg_ok "Rebooted LXC Container"
 fi
 
-export CT_LOGIN_UNAME=$LOGIN_UNAME
+export CT_LOGIN_UNAME=$loginUname
 export CT_LOGIN_UID=$LOGIN_UID
 export CT_LOGIN_GID=$LOGIN_GID
 export CT_LOGIN_PW=$LOGIN_PW
-export CT_APPLICATION_TITLE=$APPLICATION_TITLE
+export CT_APPLICATION_TITLE=$applicationTitle
 
 
 IN_CONTAINER="set -o nounset
@@ -347,5 +348,5 @@ IN_CONTAINER="$IN_CONTAINER
 IN_CONTAINER="$IN_CONTAINER
   $(<"$SCRIPT_DIR"/setup_in_new_container.func)"
 
-lxc-attach -n "$CONTAINER_ID" -- bash -c "$IN_CONTAINER" param1 "$CONTAINER_ID"
+lxc-attach -n "$containerId" -- bash -c "$IN_CONTAINER" param1 "$containerId"
 
