@@ -58,5 +58,4 @@ fi
 wget -qO - --no-cache --no-hsts https://github.com/KriGosSa/ProxmoxScripts/archive/refs/heads/main.tar.gz | tar --strip-components=1  -xz
 chmod +x start.sh
 chmod +x new_lxc.sh
-chmod +x install_homebridge.sh
 }

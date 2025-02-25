@@ -9,8 +9,6 @@ set -o nounset
 #source loads content of specified file into current shell
 SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
-#source $SCRIPT_DIR/host_functions.sh
-# shellcheck disable=SC1091
 source "$SCRIPT_DIR/colors_format_icons.func"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/error_handler.func"
@@ -60,8 +58,6 @@ while [ $# -gt 0 ]; do
 done
 
 WHIPTAIL_BACKTITLE="Configure new LXC Container"
-WHIPTAIL_HEIGHT=9
-WHIPTAIL_WIDTH=58
 
 # Check if the shell is using bash
 # if [[ "$(basename "$SHELL")" != "bash" ]]; then
@@ -87,8 +83,8 @@ fi
 #We cannot test for SSh as SUDO will clear the variable SSH_CLIENT
 # This function checks if the script is running through SSH and prompts the user to confirm if they want to proceed or exit.
 #  if [ -n "${SSH_CLIENT:+x}" ]; then
-#    if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH; then
-#      whiptail --backtitle "$WHIPTAIL_BACKTITLE" --msgbox --title "Proceed using SSH" "You've chosen to proceed using SSH. If any issues arise, please run the script in the Proxmox shell before creating a repository issue." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+#    if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $whiptailHeight $WHIPTAIL_WIDTH; then
+#      whiptail --backtitle "$WHIPTAIL_BACKTITLE" --msgbox --title "Proceed using SSH" "You've chosen to proceed using SSH. If any issues arise, please run the script in the Proxmox shell before creating a repository issue." $whiptailHeight $WHIPTAIL_WIDTH
 #    else
 #      clear
 #      echo "Exiting due to SSH usage. Please consider using the Proxmox shell."
@@ -98,7 +94,7 @@ fi
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
 if [ -z "$CONTAINER_ID" ]; then
-  if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if CONTAINER_ID=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_ID" ]; then
       msg_error "Container ID is mandatory"
       exit
@@ -118,7 +114,7 @@ fi
 
 
 if [ -z "$APPLICATION_TITLE" ]; then
-  if APPLICATION_TITLE=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if APPLICATION_TITLE=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" $whiptailHeight $WHIPTAIL_WIDTH --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$CONTAINER_ID" ]; then
       msg_info "No application title provided"
       exit
@@ -133,7 +129,7 @@ fi
 #  Example: lxc_docker_unifi_network_app
 
 if [ -z "$ROOTMAP_UNAME" ]; then
-  if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if ROOTMAP_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$ROOTMAP_UNAME" ]; then
       msg_error "Rootmap User is mandatory"
       exit
@@ -146,7 +142,7 @@ if [ -z "$ROOTMAP_UNAME" ]; then
 fi
 
 if [ -z "$LOGIN_UNAME" ]; then
-  if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
+  if LOGIN_UNAME=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" $whiptailHeight $WHIPTAIL_WIDTH --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$LOGIN_UNAME" ]; then
       msg_error "Login User is mandatory"
       exit
@@ -183,14 +179,14 @@ else
 fi
 
 while true; do
-  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "Login password" 3>&1 1>&2 2>&3); then
+  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" $whiptailHeight $WHIPTAIL_WIDTH --title "Login password" 3>&1 1>&2 2>&3); then
     if [[ -n "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
-        whiptail --msgbox "Password cannot contain spaces. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+        whiptail --msgbox "Password cannot contain spaces. Please try again." $whiptailHeight $WHIPTAIL_WIDTH
       elif ! validate_password "$LOGIN_PW1"; then
-        whiptail --msgbox "Password must meat the complexity criteria. Please try again." $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH
+        whiptail --msgbox "Password must meat the complexity criteria. Please try again." $whiptailHeight $WHIPTAIL_WIDTH
       else
-        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" $WHIPTAIL_HEIGHT $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" $whiptailHeight $WHIPTAIL_WIDTH --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
             LOGIN_PW="-password $LOGIN_PW1"
             echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
