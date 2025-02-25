@@ -4,7 +4,7 @@ local containerId="${2:-}"
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
 if [ -z "$containerId" ]; then
-  if containerId=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if containerId=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "containerId" ]; then
       msg_error "Container ID is mandatory"
       exit

@@ -1,17 +1,17 @@
   msg_info "Setting up Container OS"
-if ! LOGIN_GID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
-  groupadd --gid "$CT_LOGIN_GID" "$CT_LOGIN_UNAME"
-  msg_ok "Created group $CT_LOGIN_UNAME with GID $CT_LOGIN_GID"
+if ! loginGroupID_EXISTS=$(getent group "$CT_LOGIN_UNAME" ); then
+  groupadd --gid "$CT_loginGroupID" "$CT_LOGIN_UNAME"
+  msg_ok "Created group $CT_LOGIN_UNAME with GID $CT_loginGroupID"
 else
   msg_info "Group $CT_LOGIN_UNAME already exists"
 fi 
   
 if ! LOGIN_USER_EXISTS=$(getent passwd "$CT_LOGIN_UNAME" ); then
-  if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_LOGIN_UID" -g "$CT_LOGIN_GID" -G sudo -c "$CT_LOGIN_UNAME" ); then
+  if ! ( useradd -m "$CT_LOGIN_UNAME" -u "$CT_loginUserID" -g "$CT_loginGroupID" -G sudo -c "$CT_LOGIN_UNAME" ); then
     msg_error "Failed to create login user in container"
     exit_script
   else
-    msg_ok "Added user $CT_LOGIN_UNAME (ID $CT_LOGIN_UID) to container"
+    msg_ok "Added user $CT_LOGIN_UNAME (ID $CT_loginUserID) to container"
   fi
 else
   msg_info "Login-User $CT_LOGIN_UNAME already exist"

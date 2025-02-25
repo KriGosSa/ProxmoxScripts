@@ -58,7 +58,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-WHIPTAIL_BACKTITLE="Configure new LXC Container"
+whiptailBacktitle="Configure new LXC Container"
 
 # Check if the shell is using bash
 # if [[ "$(basename "$SHELL")" != "bash" ]]; then
@@ -84,8 +84,8 @@ fi
 #We cannot test for SSh as SUDO will clear the variable SSH_CLIENT
 # This function checks if the script is running through SSH and prompts the user to confirm if they want to proceed or exit.
 #  if [ -n "${SSH_CLIENT:+x}" ]; then
-#    if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $whiptailHeight $whiptailWidth; then
-#      whiptail --backtitle "$WHIPTAIL_BACKTITLE" --msgbox --title "Proceed using SSH" "You've chosen to proceed using SSH. If any issues arise, please run the script in the Proxmox shell before creating a repository issue." $whiptailHeight $whiptailWidth
+#    if whiptail --backtitle "$whiptailBacktitle" --defaultno --title "SSH DETECTED" --yesno "It's advisable to utilize the Proxmox shell rather than SSH, as there may be potential complications with variable retrieval. Proceed using SSH?" $whiptailHeight $whiptailWidth; then
+#      whiptail --backtitle "$whiptailBacktitle" --msgbox --title "Proceed using SSH" "You've chosen to proceed using SSH. If any issues arise, please run the script in the Proxmox shell before creating a repository issue." $whiptailHeight $whiptailWidth
 #    else
 #      clear
 #      echo "Exiting due to SSH usage. Please consider using the Proxmox shell."
@@ -95,7 +95,7 @@ fi
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
 if [ -z "$containerId" ]; then
-  if containerId=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Container ID" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if containerId=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Container ID" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$containerId" ]; then
       msg_error "Container ID is mandatory"
       exit
@@ -115,7 +115,7 @@ fi
 
 
 if [ -z "$applicationTitle" ]; then
-  if applicationTitle=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set Application Title" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  if applicationTitle=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Application Title" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$containerId" ]; then
       msg_info "No application title provided"
       exit
@@ -130,7 +130,7 @@ fi
 #  Example: lxc_docker_unifi_network_app
 
 if [ -z "$rootmapUname" ]; then
-  if rootmapUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" "$whiptailHeight" "$whiptailWidth" --title "Login User" 3>&1 1>&2 2>&3); then
+  if rootmapUname=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Create user to map container root to (Naming convention: All small letters! Capitals not allowed lxc_<<container>>)" "$whiptailHeight" "$whiptailWidth" --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$rootmapUname" ]; then
       msg_error "Rootmap User is mandatory"
       exit
@@ -143,7 +143,7 @@ if [ -z "$rootmapUname" ]; then
 fi
 
 if [ -z "$loginUname" ]; then
-  if loginUname=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" "$whiptailHeight" "$whiptailWidth" --title "Login User" 3>&1 1>&2 2>&3); then
+  if loginUname=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set login user name (Naming convention: All small letters! Capitals not allowed. E.g. chris)" "$whiptailHeight" "$whiptailWidth" --title "Login User" 3>&1 1>&2 2>&3); then
     if [ -z "$loginUname" ]; then
       msg_error "Login User is mandatory"
       exit
@@ -155,24 +155,24 @@ if [ -z "$loginUname" ]; then
   fi
 fi
 
-if loginUid=$(getent passwd "$loginUname" | cut -f 3 -d ":"); then
-  if [ -z "$loginUid" ]; then
+if loginUserID=$(getent passwd "$loginUname" | cut -f 3 -d ":"); then
+  if [ -z "$loginUserID" ]; then
     msg_error "Unable to determine User ID of login user on the host"
     exit
   else
-    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user ID: ${COLOR_BRIGHT_GREEN}$loginUid${COLOR_RESET}"
+    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user ID: ${COLOR_BRIGHT_GREEN}$loginUserID${COLOR_RESET}"
   fi
 else
   msg_error "Failed to determine User ID of login user on the host"
   exit
 fi
 
-if LOGIN_GID=$(getent passwd "$loginUname" | cut -f 4 -d ":"); then
-  if [ -z "$LOGIN_GID" ]; then
+if loginGroupID=$(getent passwd "$loginUname" | cut -f 4 -d ":"); then
+  if [ -z "$loginGroupID" ]; then
     msg_error "Unable to determine Group ID of login user on the host"
     exit
   else
-    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user group ID: ${COLOR_BRIGHT_GREEN}$LOGIN_GID${COLOR_RESET}"
+    echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login user group ID: ${COLOR_BRIGHT_GREEN}$loginGroupID${COLOR_RESET}"
   fi
 else
   msg_error "Failed to determine group ID of login user on the host"
@@ -180,14 +180,14 @@ else
 fi
 
 while true; do
-  if LOGIN_PW1=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nSet Login Password" "$whiptailHeight" "$whiptailWidth" --title "Login password" 3>&1 1>&2 2>&3); then
+  if LOGIN_PW1=$(whiptail --backtitle "$whiptailBacktitle" --passwordbox "\nSet Login Password" "$whiptailHeight" "$whiptailWidth" --title "Login password" 3>&1 1>&2 2>&3); then
     if [[ -n "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
         whiptail --msgbox "Password cannot contain spaces. Please try again." "$whiptailHeight" "$whiptailWidth"
       elif ! validate_password "$LOGIN_PW1"; then
         whiptail --msgbox "Password must meat the complexity criteria. Please try again." "$whiptailHeight" "$whiptailWidth"
       else
-        if LOGIN_PW2=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --passwordbox "\nVerify Login Password" "$whiptailHeight" "$whiptailWidth" --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
+        if LOGIN_PW2=$(whiptail --backtitle "$whiptailBacktitle" --passwordbox "\nVerify Login Password" "$whiptailHeight" "$whiptailWidth" --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
             LOGIN_PW="-password $LOGIN_PW1"
             echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
@@ -215,7 +215,7 @@ if status "$containerId" &>/dev/null; then
 fi
 
 if [ -z "$containerMount" ]; then
-  if containerMount=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set directory to be mounted into container" "$WHIPTAIL_HEIGHT" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container" "$WHIPTAIL_HEIGHT" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
     if [ -z "$containerMount" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit
@@ -265,20 +265,20 @@ chown -c "$rootmapUname":"$loginUname" -R "$containerMount"
 
 #cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
 #https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
-MAP_TO_INVALID_LOWER_UID=$((LOGIN_UID - 1))
-MAP_TO_INVALID_LOWER_GID=$((LOGIN_GID - 1))
-MAP_TO_INVALID_HIGHER_START_UID=$((LOGIN_UID + 1))
-MAP_TO_INVALID_HIGHER_START_GID=$((LOGIN_GID + 1))
-MAP_TO_INVALID_HIGHER_CNT_UID=$((65535 - LOGIN_UID))
-MAP_TO_INVALID_HIGHER_CNT_GID=$((65535 - LOGIN_GID))
+MAP_TO_INVALID_LOWER_UID=$(( loginUserID- 1))
+MAP_TO_INVALID_LOWER_GID=$((loginGroupID - 1))
+MAP_TO_INVALID_HIGHER_START_UID=$((loginUserID + 1))
+MAP_TO_INVALID_HIGHER_START_GID=$((loginGroupID + 1))
+MAP_TO_INVALID_HIGHER_CNT_UID=$((65535 - loginUserID))
+MAP_TO_INVALID_HIGHER_CNT_GID=$((65535 - loginGroupID))
 
 
 
 # Check root mapping and add if needed
 map_id 0 "$ROOTMAP_UID" u 1
 map_id 0 "$ROOTMAP_GID" g 1
-map_id "$LOGIN_UID" "$LOGIN_UID" u 1
-map_id "$LOGIN_GID" "$LOGIN_GID" g 1
+map_id "$loginUserID" "$loginUserID" u 1
+map_id "$loginGroupID" "$loginGroupID" g 1
 map_id 1 100000 u $MAP_TO_INVALID_LOWER_UID
 map_id 1 100000 g $MAP_TO_INVALID_LOWER_GID
 map_id $MAP_TO_INVALID_HIGHER_START_UID 10$MAP_TO_INVALID_HIGHER_START_UID u $MAP_TO_INVALID_HIGHER_CNT_UID
@@ -332,8 +332,8 @@ msg_ok "Rebooted LXC Container"
 fi
 
 export CT_LOGIN_UNAME=$loginUname
-export CT_LOGIN_UID=$LOGIN_UID
-export CT_LOGIN_GID=$LOGIN_GID
+export CT_loginUserID=$loginUserID
+export CT_loginGroupID=$loginGroupID
 export CT_LOGIN_PW=$LOGIN_PW
 export CT_APPLICATION_TITLE=$applicationTitle
 
