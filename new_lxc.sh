@@ -193,7 +193,7 @@ while true; do
             echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
             break
           else
-            whiptail --msgbox "Passwords do not match. Please try again." "$WHIPTAIL_HEIGHT" "$whiptailWidth"
+            whiptail --msgbox "Passwords do not match. Please try again." "$whiptailHeight" "$whiptailWidth"
           fi
         else
           exit_script
@@ -215,7 +215,7 @@ if status "$containerId" &>/dev/null; then
 fi
 
 if [ -z "$containerMount" ]; then
-  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container" "$WHIPTAIL_HEIGHT" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container" "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
     if [ -z "$containerMount" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit
