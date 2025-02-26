@@ -7,9 +7,10 @@ set -o nounset
 local install_current_folder="${1:-}"
 local whiptailHeight=12
 local whiptailWidth=72
-local WHIPTAIL_BACKTITLE="WP Title"
+local whiptailBacktitle="WP Title"
 
-local currentFolder=$(pwd)
+local currentFolder
+currentFolder=$(pwd) #ShelCheck warns that doing declaration and assignment in one line masks the returncode if (pwd) fails
 if [[ $install_current_folder == true ]]; then
   local installDir="$currentFolder"
 else 
@@ -17,7 +18,7 @@ else
 fi 
 
 if [ -z "$installDir" ]; then
-  if installDir=$(whiptail --backtitle "$WHIPTAIL_BACKTITLE" --inputbox "Set install directory" $whiptailHeight $whiptailWidth "$currentFolder" --title "Install directory" 3>&1 1>&2 2>&3); then
+  if installDir=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set install directory" $whiptailHeight $whiptailWidth "$currentFolder" --title "Install directory" 3>&1 1>&2 2>&3); then
     if [ -z "$installDir" ]; then
       echo "No installation directory provided"
       exit
@@ -36,7 +37,7 @@ cd "$installDir" || exit
 
 if ls -A "$installDir" | grep -v '^archive' > /dev/null; then
   #echo "There are files not starting with 'archive'."
-  if whiptail --backtitle "$WHIPTAIL_BACKTITLE" --yesno "Folder is not empty, move all files to an archive folder (else update will be cancelled)?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then
+  if whiptail --backtitle "$whiptailBacktitle" --yesno "Folder is not empty, move all files to an archive folder (else update will be cancelled)?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then
     #create folder starting with archive_ and then a random string
     archivedir=$(mktemp -d archive_XXXXXXXXXXX)
     #move all files (except those starting with archive) into the new folder

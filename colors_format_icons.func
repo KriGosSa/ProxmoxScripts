@@ -1,7 +1,8 @@
 #!/bin/bash
 # This function sets various color variables using ANSI escape codes for formatting text in the terminal.
   # Colors
-  COLOR_YELLOW=$(echo "\033[33m")
+  # shellcheck disable=SC2034
+  COLOR_YELLOW="\033[33m"
   COLOR_BRIGHT_YELLOW=$(echo "\033[93m")
   COLOR_BLUE=$(echo "\033[36m")
   COLOR_RED=$(echo "\033[01;31m")

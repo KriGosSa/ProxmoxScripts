@@ -1,6 +1,6 @@
 #!/bin/bash
 # This function displays a spinner.
-local spinnerPid=""
+spinnerPid=""
 function start_spinner() {
   local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
   local spinI=0
