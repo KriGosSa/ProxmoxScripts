@@ -338,15 +338,15 @@ export CT_LOGIN_PW=$LOGIN_PW
 export CT_APPLICATION_TITLE=$applicationTitle
 
 
-IN_CONTAINER="set -o nounset
-  $(<"$SCRIPT_DIR/colors_format_icons.func")"
-IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR/error_handler.func")
-    activate_err_handler"
-IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR"/message_spinner.func)"
-IN_CONTAINER="$IN_CONTAINER
-  $(<"$SCRIPT_DIR"/setup_in_new_container.func)"
+#IN_CONTAINER="set -o nounset
+#  $(<"$SCRIPT_DIR/colors_format_icons.func")"
+#IN_CONTAINER="$IN_CONTAINER
+#  $(<"$SCRIPT_DIR/error_handler.func")
+#    activate_err_handler"
+#IN_CONTAINER="$IN_CONTAINER
+#  $(<"$SCRIPT_DIR"/message_spinner.func)"
+#IN_CONTAINER="$IN_CONTAINER
+#  $(<"$SCRIPT_DIR"/setup_in_new_container.func)"
 
-lxc-attach -n "$containerId" -- bash -c "$IN_CONTAINER" param1 "$containerId"
-
+#lxc-attach -n "$containerId" -- bash -c "$IN_CONTAINER" param1 "$containerId"
+exec_in_lxc "setup_in_new_container.func)" "$containerID"
