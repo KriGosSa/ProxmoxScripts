@@ -37,11 +37,11 @@ inContainer="set -o nounset
 #inContainer="$inContainer
   $(<"$scriptDir/message_spinner.func")
 #inContainer="$inContainer
-  $(<"${scriptDir}/${script}")"
+  $(<"${scriptDir}/${script}")
   
 echo $inContainer 
 
-lxc-attach -n "containerId" -- bash -c "$inContainer" 
+lxc-attach -n "$containerId" -- bash -c "$inContainer" 
 
 
 }
