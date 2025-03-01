@@ -20,6 +20,8 @@ source "$SCRIPT_DIR/password_validation.func"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/usermap.func"
 
+source "$SCRIPT_DIR/exec_script_in_container.func"
+
 containerId=""
 rootmapUname=""
 loginUname=""
