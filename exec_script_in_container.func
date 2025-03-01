@@ -31,12 +31,9 @@ local scriptDir=$(dirname "$0")
 
 inContainer="set -o nounset
   $(<"$scriptDir/colors_format_icons.func")
-#inContainer="$inContainer
   $(<"$scriptDir/error_handler.func")
     activate_err_handler
-#inContainer="$inContainer
   $(<"$scriptDir/message_spinner.func")
-#inContainer="$inContainer
   $(<"${scriptDir}/${script}")
   
 echo $inContainer 
