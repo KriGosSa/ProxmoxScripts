@@ -321,7 +321,7 @@ fi
 
 #sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
 
-if pct status 102 | grep -Fq "stopped"; then
+if pct status "$containerId" | grep -Fq "stopped"; then
 msg_progress "Starting LXC Container"
 pct start "$containerId"
 msg_ok "Started LXC Container"
@@ -349,4 +349,4 @@ export CT_APPLICATION_TITLE=$applicationTitle
 #  $(<"$SCRIPT_DIR"/setup_in_new_container.func)"
 
 #lxc-attach -n "$containerId" -- bash -c "$IN_CONTAINER" param1 "$containerId"
-exec_in_lxc "setup_in_new_container.func)" "$containerID"
+exec_in_lxc "setup_in_new_container.func" "$containerId"
