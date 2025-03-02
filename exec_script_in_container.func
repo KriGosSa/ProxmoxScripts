@@ -34,7 +34,7 @@ inContainer="set -o nounset
   $(<${scriptDir}/error_handler.func)
     activate_err_handler
   $(<${scriptDir}/message_spinner.func)
-  $(<${scriptDir}/${script})
+  $(<${scriptDir}/${script})"
   
 echo $inContainer 
 
