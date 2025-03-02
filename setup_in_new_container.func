@@ -20,8 +20,8 @@ fi
 echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd -c SHA512
 
 
-local retryNum=10
-local retryEvery=3
+retryNum=10
+retryEvery=3
 
 # This function sets up the Container OS by generating the locale, setting the timezone, and checking the network connection
 
