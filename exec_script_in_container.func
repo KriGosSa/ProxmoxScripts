@@ -35,8 +35,6 @@ inContainer="set -o nounset
     activate_err_handler
   $(<${scriptDir}/message_spinner.func)
   $(<${scriptDir}/${script})"
-  
-echo $inContainer 
 
 lxc-attach -n "$containerId" -- bash -c "$inContainer" 
 
