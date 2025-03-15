@@ -18,7 +18,7 @@ else
 fi
 
 echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" | chpasswd -c SHA512
-echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW" |
+echo "$CT_LOGIN_UNAME:$CT_LOGIN_PW"
 
 retryNum=10
 retryEvery=3
