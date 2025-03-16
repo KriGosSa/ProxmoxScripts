@@ -191,7 +191,7 @@ while true; do
       else
         if LOGIN_PW2=$(whiptail --backtitle "$whiptailBacktitle" --passwordbox "\nVerify Login Password" "$whiptailHeight" "$whiptailWidth" --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
-            LOGIN_PW="-password $LOGIN_PW1"
+            LOGIN_PW="$LOGIN_PW1"
             echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
             break
           else
@@ -206,6 +206,7 @@ while true; do
     exit_script
   fi
 done
+
 
 
 # Test if ID is in use
