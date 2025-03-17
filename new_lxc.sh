@@ -8,18 +8,18 @@ set -o nounset
 #which is then used as argument for source command
 #source loads content of specified file into current shell
 SCRIPT_DIR=$(dirname "$0")
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/colors_format_icons.func"
 source "$SCRIPT_DIR/colors_format_icons.func"
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/error_handler.func"
 source "$SCRIPT_DIR/error_handler.func"
 activate_err_handler
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/message_spinner.func"
 source "$SCRIPT_DIR/message_spinner.func"
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/password_validation.func"
 source "$SCRIPT_DIR/password_validation.func"
-# shellcheck disable=SC1091
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/usermap.func"
 source "$SCRIPT_DIR/usermap.func"
-
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/exec_script_in_container.func"
 source "$SCRIPT_DIR/exec_script_in_container.func"
 
 containerId=""

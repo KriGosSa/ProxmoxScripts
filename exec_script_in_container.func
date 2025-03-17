@@ -1,44 +1,46 @@
-function exec_in_lxc() {
-local script="${1}" #script is a mandatory parameter
-local containerId="${2:-}"
+#!/bin/bash
 
-#Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
-if [ -z "$containerId" ]; then
-  if containerId=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
-    if [ -z "containerId" ]; then
-      msg_error "Container ID is mandatory"
-      exit
-    else
-      # Test if ID is valid
-      if [ "$containerId" -lt "100" ]; then
-        msg_error "ID cannot be less than 100."
-        exit
-      else
-        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$containerId${COLOR_RESET}"
-      fi
-    fi
-  else
-    exit
-  fi
-fi
-
-#$0 returns relative or absolute path to the executed script
-#dirname returns relative path to directory, where the $0 script exists
-#$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script,
-#which is then used as argument for source command
-#source loads content of specified file into current shell
-local scriptDir=$(dirname "$0")
-
-inContainer="set -o nounset
-  $(<"$scriptDir/colors_format_icons.func")
-  $(<"$scriptDir/error_handler.func")
-    activate_err_handler
-  $(<"$scriptDir/message_spinner.func")
-  $(<"${scriptDir}/${script}")
-  
-echo $inContainer 
-
-lxc-attach -n "$containerId" -- bash -c "$inContainer" 
-
-
-}
+#function exec_in_lxc() {
+#local script="${1}" #script is a mandatory parameter
+#local containerId="${2:-}"
+#
+##Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
+#if [ -z "$containerId" ]; then
+#  if containerId=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+#    if [ -z "$containerId" ]; then
+#      msg_error "Container ID is mandatory"
+#      exit
+#    else
+#      # Test if ID is valid
+#      if [ "$containerId" -lt "100" ]; then
+#        msg_error "ID cannot be less than 100."
+#        exit
+#      else
+#        echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Container ID: ${COLOR_BRIGHT_GREEN}$containerId${COLOR_RESET}"
+#      fi
+#    fi
+#  else
+#    exit
+#  fi
+#fi
+#
+##$0 returns relative or absolute path to the executed script
+##dirname returns relative path to directory, where the $0 script exists
+##$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script,
+##which is then used as argument for source command
+##source loads content of specified file into current shell
+#local scriptDir=$(dirname "$0")#
+#
+#inContainer="set -o nounset
+#  $(<"$scriptDir/colors_format_icons.func")
+#  $(<"$scriptDir/error_handler.func")
+#    activate_err_handler
+#  $(<"$scriptDir/message_spinner.func")
+#  $(<"${scriptDir}/${script}")
+#  
+#echo $inContainer 
+#
+#lxc-attach -n "$containerId" -- bash -c "$inContainer" 
+#
+#
+#}
