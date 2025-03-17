@@ -26,6 +26,7 @@ containerId=""
 rootmapUname=""
 loginUname=""
 containerMount=""
+mountpointInContainer=""
 applicationTitle=""
 test=false
 spinnerPid=""
@@ -49,6 +50,9 @@ while [ $# -gt 0 ]; do
     ;;
   --test | -test)
     test=true
+    ;;
+  --mountpointincontainer=* | -mountpointincontainer=*)
+    mountpointInContainer="${1#*=}"
     ;;
   *)
     printf "***************************\n"
@@ -232,6 +236,21 @@ if [ -z "$containerMount" ]; then
   fi
 fi
 
+if [ -z "$mountpointInContainer" ]; then
+  if mountpointInContainer=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Mount external folder in which path in the container?" 
+      "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+    
+    if [ -z "$mountpointInContainer" ]; then
+      msg_error "Mount point in container must be specified"
+      exit
+    else
+      echo -e "${ICON_CONTAINER_ID}${FORMAT_BOLD}${COLOR_DARK_GREEN}Mount point in container: ${COLOR_BRIGHT_GREEN}$mountpointInContainer${COLOR_RESET}"
+    fi
+  else
+    exit
+  fi
+fi
+
 LXC_CONFIG=/etc/pve/lxc/${containerId}.conf
 if [[ $test == true ]]; then
   LXC_CONFIG_TEST="${LXC_CONFIG}.test"
@@ -267,6 +286,15 @@ if [ ! -d "$containerMount" ]; then
   mkdir "$containerMount"
 fi
 chown -c "$rootmapUname":"$loginUname" -R "$containerMount"
+
+# Map the external folder into the container
+msg_progress "Mapping external folder into container"
+if ! pct set "$containerId" -mp0 "$containerMount,mp=$mountpointInContainer"; then
+  msg_error "Failed to map folder into container"
+  exit
+else
+  msg_ok "Successfully mapped folder into container"
+fi
 
 #cat << EOF >> /var/lib/lxc/100/config #var-config should be left untouched
 #https://forum.proxmox.com/threads/lxc-id-mapping-issue.41181/post-198259
