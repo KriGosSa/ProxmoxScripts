@@ -5,7 +5,8 @@ local containerId="${2:-}"
 
 #Whiptail sends the user's input to stderr, 3>&1 1>&2 2>&3 switched stderr and stdout, so we can retrieve the value
 if [ -z "$containerId" ]; then
-  if containerId=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Container ID" $whiptailHeight $whiptailWidth --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
+  # shellcheck disable=SC2154  # $whiptailHeight & $whiptailWidth are defined in the calling script
+  if containerId=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set Container ID" "$whiptailHeight" "$whiptailWidth" --title "CONTAINER ID" 3>&1 1>&2 2>&3); then
     if [ -z "$containerId" ]; then
       msg_error "Container ID is mandatory"
       exit
@@ -28,14 +29,15 @@ fi
 #$( dirname "$0" ) the dirname "$0" command returns relative path to directory of executed script,
 #which is then used as argument for source command
 #source loads content of specified file into current shell
-local scriptDir=$(dirname "$0")
+local scriptDir #Separated declaration and assignment due to returncode of the assignment otherwise being masked by the return code of the declaration
+scriptDir=$(dirname "$0")
 
 inContainer="set -o nounset
-  $(<${scriptDir}/colors_format_icons.func)
-  $(<${scriptDir}/error_handler.func)
+  $(<"${scriptDir}"/colors_format_icons.func)
+  $(<"${scriptDir}"/error_handler.func)
     activate_err_handler
-  $(<${scriptDir}/message_spinner.func)
-  $(<${scriptDir}/${script})"
+  $(<"${scriptDir}"/message_spinner.func)
+  $(<"${scriptDir}"/"${script}")"
 
 lxc-attach -n "$containerId" -- bash -c "$inContainer" 
 

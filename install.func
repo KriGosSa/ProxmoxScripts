@@ -35,6 +35,7 @@ if [ ! -d "$installDir" ]; then
 else
 cd "$installDir" || exit
 
+# shellcheck disable=SC2010 #// If we miss some files, that is not a problem, we just want to clean up our old files and we do not use special file names
 if ls -A "$installDir" | grep -v '^archive' > /dev/null; then
   #echo "There are files not starting with 'archive'."
   if whiptail --backtitle "$whiptailBacktitle" --yesno "Folder is not empty, move all files to an archive folder (else update will be cancelled)?" $whiptailHeight $whiptailWidth --title "Cleanup Install directory"; then

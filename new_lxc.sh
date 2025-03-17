@@ -186,7 +186,7 @@ while true; do
     if [[ -n "$LOGIN_PW1" ]]; then
       if [[ "$LOGIN_PW1" == *" "* ]]; then
         whiptail --msgbox "Password cannot contain spaces. Please try again." "$whiptailHeight" "$whiptailWidth"
-      elif ! validate_password "$LOGIN_PW1"; then
+      elif ! validate_password "$LOGIN_PW1" "$test"; then
         whiptail --msgbox "Password must meat the complexity criteria. Please try again." "$whiptailHeight" "$whiptailWidth"
       else
         if LOGIN_PW2=$(whiptail --backtitle "$whiptailBacktitle" --passwordbox "\nVerify Login Password" "$whiptailHeight" "$whiptailWidth" --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
