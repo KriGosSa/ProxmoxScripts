@@ -191,7 +191,7 @@ while true; do
       else
         if LOGIN_PW2=$(whiptail --backtitle "$whiptailBacktitle" --passwordbox "\nVerify Login Password" "$whiptailHeight" "$whiptailWidth" --title "PASSWORD VERIFICATION" 3>&1 1>&2 2>&3); then
           if [[ "$LOGIN_PW1" == "$LOGIN_PW2" ]]; then
-            LOGIN_PW="-password $LOGIN_PW1"
+            LOGIN_PW="$LOGIN_PW1"
             echo -e "${ICON_PASSWORD}${FORMAT_BOLD}${COLOR_DARK_GREEN}Login Password: ${COLOR_BRIGHT_GREEN}********${COLOR_RESET}"
             break
           else
@@ -208,6 +208,7 @@ while true; do
 done
 
 
+
 # Test if ID is in use
 if status "$containerId" &>/dev/null; then
   echo -e "ID '$containerId' does not exist."
@@ -217,7 +218,9 @@ if status "$containerId" &>/dev/null; then
 fi
 
 if [ -z "$containerMount" ]; then
-  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container" "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container (e.g. /data/homebridge or /data/docker/uinifi)" 
+      "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+    
     if [ -z "$containerMount" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
       exit
