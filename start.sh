@@ -13,6 +13,8 @@ SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/colors_format_icons.func"
 # shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/install.func"
 source "$SCRIPT_DIR/install.func"
+# shellcheck source="/Volumes/DataExt/Chris/Cursor/Proxmox Scripts/ProxmoxScripts/exec_script_in_container.func"
+source "$SCRIPT_DIR/exec_script_in_container.func"
 
 # Using whiptail to create a menu
 scriptCount=3
