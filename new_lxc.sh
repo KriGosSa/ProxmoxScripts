@@ -237,8 +237,7 @@ if [ -z "$containerMount" ]; then
 fi
 
 if [ -z "$mountpointInContainer" ]; then
-  if mountpointInContainer=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Mount external folder in which path in the container?" 
-      "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+  if mountpointInContainer=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Mount external folder in which path in the container?" "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
     
     if [ -z "$mountpointInContainer" ]; then
       msg_error "Mount point in container must be specified"
