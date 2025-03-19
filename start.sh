@@ -32,7 +32,7 @@ case $CHOICE in
         bash "$SCRIPT_DIR/new_lxc.sh"
         ;;
     3)
-        bash "$SCRIPT_DIR/install_homebridge.sh"
+        bash "exec_in_lxc install_homebridge.sh"
         ;;
     *)
         echo "Invalid choice"
