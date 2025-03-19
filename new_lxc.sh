@@ -222,8 +222,7 @@ if status "$containerId" &>/dev/null; then
 fi
 
 if [ -z "$containerMount" ]; then
-  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container (e.g. /data/homebridge or /data/docker/uinifi)" 
-      "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
+  if containerMount=$(whiptail --backtitle "$whiptailBacktitle" --inputbox "Set directory to be mounted into container (e.g. /data/homebridge or /data/docker/uinifi)" "$whiptailHeight" "$whiptailWidth" --title "Mount folder" 3>&1 1>&2 2>&3); then
     
     if [ -z "$containerMount" ]; then
       msg_error "Data loss may happen, data should be stored outside container"
